@@ -1,0 +1,360 @@
+/* ─────────────────────────────────────────────────────────────
+   AFTR — blocks 01 (hero) + 02 (manifesto)
+   Sizes come from the Figma desktop frame (1440 wide) and are
+   expressed in vw so the composition holds at any width.
+   ───────────────────────────────────────────────────────────── */
+:root{
+  --ink:#0B0B0B;
+  --paper:#F2F1EE;
+  --grey:#8A8A8A;
+
+  --pad:max(20px, 2.7778vw);                 /* 40px @1440 */
+  --top:max(20px, 2.2222vw);                 /* 32px @1440 */
+  --fs-label:12px;                           /* Geist Mono, caps, +4% */
+  --fs-tag:clamp(13px, 1.3889vw, 22px);      /* 20px @1440, Geist Light */
+  --fs-logo:27.7778vw;                       /* 400px @1440, Anton */
+  --fs-h2:min(6.6667vw, 10.6667vh);          /* 96px @1440x900, Anton */
+  --fs-body:clamp(14px, 1.0417vw, 17px);     /* 15px @1440 */
+
+  --slot-w:30.5556vw;                        /* 440px @1440 */
+  --slot-r:28px;
+
+  --ease-expo:cubic-bezier(0.16,1,0.3,1);
+  --runway:520vh;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--ink);overscroll-behavior:none}
+html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{
+  font-family:'Geist',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
+  color:var(--paper);
+  line-height:1.3;
+}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:1px solid var(--paper);outline-offset:4px}
+::selection{background:var(--paper);color:var(--ink)}
+
+.label{
+  font-family:'Geist Mono',ui-monospace,monospace;
+  font-size:var(--fs-label);
+  line-height:1.2;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+}
+.h2{
+  font-family:'Anton',Impact,sans-serif;
+  font-weight:400;
+  font-size:var(--fs-h2);
+  line-height:0.9;
+  text-transform:uppercase;
+  letter-spacing:0;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   STAGE — full-viewport video. JS writes --k (scale), --dx/--dy,
+   --ix/--iy (clip insets, unscaled px) and --r (radius, unscaled px)
+   to fold it into the window of block 02. Transform + clip-path only.
+   ───────────────────────────────────────────────────────────── */
+.stage{
+  position:fixed;
+  inset:0;
+  z-index:1;
+  overflow:hidden;
+  transform-origin:50% 50%;
+  transform:translate3d(var(--dx,0px), var(--dy,0px), 0) scale(var(--k,1));
+  clip-path:inset(var(--iy,0px) var(--ix,0px) round var(--r,0px));
+  will-change:transform, clip-path;
+  background:#000;
+}
+.stage video,
+.stage canvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:50% 50%;
+  display:block;
+}
+canvas.plate{opacity:0;transition:opacity 240ms linear}
+canvas.plate.is-live{opacity:1}
+canvas.plate.is-off{opacity:0;transition:none}
+
+/* Figma "shade": darker top for the nav, darker bottom for the logo.
+   Fades out as the video becomes a window. */
+.shade{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:calc(1 - var(--fold,0));
+  background:linear-gradient(180deg,
+    rgba(0,0,0,.35) 0%,
+    rgba(0,0,0,0) 35%,
+    rgba(0,0,0,.10) 60%,
+    rgba(0,0,0,.75) 100%);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   NAV
+   ───────────────────────────────────────────────────────────── */
+.nav{
+  position:fixed;
+  z-index:30;
+  top:calc(var(--top) + env(safe-area-inset-top));
+  left:0;right:0;
+  padding-inline:var(--pad);
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  pointer-events:none;
+}
+.nav__links,.nav__actions{display:flex;gap:32px}
+.nav__actions{justify-self:end}
+.nav__item{
+  font-family:'Geist Mono',ui-monospace,monospace;
+  font-size:var(--fs-label);
+  line-height:1.2;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  pointer-events:auto;
+  position:relative;
+  transition:opacity 200ms var(--ease-expo);
+}
+.nav__item::after{content:'';position:absolute;inset:-14px -8px}   /* 44px hit area */
+.nav__clock{pointer-events:none;font-variant-numeric:tabular-nums}
+.nav__menu{display:none}
+@media (hover:hover) and (pointer:fine){
+  .nav a.nav__item:hover,.m-drop:hover{opacity:.55}
+}
+
+/* ─────────────────────────────────────────────────────────────
+   01 HERO — type over the video
+   ───────────────────────────────────────────────────────────── */
+.hero{
+  position:fixed;
+  inset:0;
+  z-index:20;
+  pointer-events:none;
+  perspective:1200px;       /* vanishing point at viewport centre — drives .exit-3d */
+}
+.hero__title{
+  position:absolute;
+  left:0;right:0;
+  /* Anton baseline sits 0.076em above the line-box bottom; caps rest 30px@1440 above the fold */
+  bottom:calc(env(safe-area-inset-bottom) + 2.0833vw - 0.076 * var(--fs-logo));
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0;
+}
+.hero__tag{
+  font-family:'Geist',sans-serif;
+  font-weight:300;
+  font-size:var(--fs-tag);
+  line-height:1.35;
+  letter-spacing:0.02em;
+  text-transform:uppercase;
+  text-align:center;
+  position:relative;
+  z-index:1;
+  margin-bottom:calc(0.186 * var(--fs-logo));   /* ≈100px gap to the cap line @1440 (Figma) */
+}
+
+/* Logo: Anton A·TR + Pinyon Script f (1.25×) that sweeps through A and T.
+   line-height:0 on the script span: Pinyon's metrics would otherwise grow
+   the Anton line box (same trick as PLATE's script A). */
+.logo{
+  font-family:'Anton',Impact,sans-serif;
+  font-weight:400;
+  font-size:var(--fs-logo);
+  line-height:1;
+  letter-spacing:-0.02em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  position:relative;
+}
+.logo__f{
+  font-family:'Pinyon Script',cursive;
+  font-size:1.25em;
+  line-height:0;
+  text-transform:none;
+  letter-spacing:-0.04em;
+  margin-left:-0.06em;
+  position:relative;
+  z-index:1;
+}
+.logo__reg{
+  position:absolute;
+  font-family:'Geist',sans-serif;
+  font-weight:500;
+  font-size:0.2em;
+  line-height:1;
+  letter-spacing:0;
+  top:0.12em;
+  right:-0.9em;
+}
+
+.hero__drop,.hero__scroll{
+  position:absolute;
+  bottom:calc(36px + env(safe-area-inset-bottom));
+}
+.hero__drop{left:var(--pad)}
+.hero__scroll{right:var(--pad)}
+
+/* EXIT-3D (from the PLATE reference) — one variable, --exit 0→1:
+   grows, sinks below the fold, blurs and fades. */
+.exit-3d{
+  transform:translate3d(0,0,calc(var(--exit,0) * 680px));
+  opacity:calc(1 - var(--exit,0) * var(--exit,0));
+}
+.exit-3d.is-exiting{filter:blur(calc(var(--exit,0) * var(--exit,0) * 8px))}
+.exit-3d.is-gone{visibility:hidden;filter:none}
+
+.fade-out{opacity:calc(1 - var(--out,0))}
+
+/* ─────────────────────────────────────────────────────────────
+   02 MANIFESTO — fixed layer over the folded video
+   ───────────────────────────────────────────────────────────── */
+.manifesto{
+  position:fixed;
+  inset:0;
+  z-index:10;
+  pointer-events:none;
+  visibility:hidden;
+}
+.manifesto.is-on{visibility:visible}
+.manifesto a{pointer-events:auto}
+
+.m-head{
+  position:absolute;
+  left:var(--pad);
+  top:calc(var(--top) + 56px);
+}
+.m-drop{
+  position:absolute;
+  right:var(--pad);
+  top:calc(var(--top) + 60px);
+  transition:opacity 200ms var(--ease-expo);
+}
+
+/* Invisible target box: JS measures it and folds the video into it. */
+.m-slot{
+  position:absolute;
+  left:50%;
+  top:calc(50% - 4vh);
+  width:var(--slot-w);
+  aspect-ratio:440 / 280;
+  transform:translate(-50%,-50%);
+}
+
+.m-note{
+  position:absolute;
+  top:calc(50% - 4vh);
+  transform:translateY(-50%);
+  width:19.4444vw;               /* 280px @1440 */
+  max-width:300px;
+  font-size:var(--fs-body);
+  line-height:1.45;
+  letter-spacing:-0.005em;
+}
+.m-note--l{left:var(--pad)}
+.m-note--r{right:var(--pad);text-align:right}
+
+.m-statement{
+  position:absolute;
+  left:0;right:0;
+  bottom:calc(var(--pad) + env(safe-area-inset-bottom));
+  text-align:center;
+}
+
+/* RISE — scroll-driven entrance: --in 0 (below, blurred, hidden) → 1 */
+.rise{
+  opacity:var(--in,0);
+  translate:0 calc((1 - var(--in,0)) * 24px);
+}
+.rise.is-anim{filter:blur(calc((1 - var(--in,0)) * 10px))}
+
+/* statement words type in one by one (TOKYO NOCTURNE s2-word) */
+.word{
+  display:inline-block;
+  opacity:var(--in,0);
+  translate:0 calc((1 - var(--in,0)) * 18px);
+}
+.word.is-anim{filter:blur(calc((1 - var(--in,0)) * 12px))}
+
+.runway{height:var(--runway)}
+
+/* ─────────────────────────────────────────────────────────────
+   ENTRANCE — blur-in on load (PLATE). Rested state is the design.
+   ───────────────────────────────────────────────────────────── */
+.js .logo,.js .hero__tag,.js .nav__item,.js .hero__drop,.js .hero__scroll{opacity:0}
+.js .logo{filter:blur(14px)}
+.js .nav__item{filter:blur(8px);transform:translateY(12px)}
+.js .stage video,.js .stage canvas{filter:blur(12px);scale:1.06}
+
+.is-ready .logo{opacity:1;filter:none;transition:opacity 1400ms var(--ease-expo),filter 1400ms var(--ease-expo)}
+.is-ready .hero__tag{opacity:1;transition:opacity 700ms var(--ease-expo) 380ms}
+.is-ready .hero__drop,.is-ready .hero__scroll{opacity:calc(1 - var(--out,0));transition:opacity 700ms var(--ease-expo) 600ms}
+.is-ready .nav__item{opacity:1;filter:none;transform:none;transition:opacity 700ms var(--ease-expo),filter 700ms var(--ease-expo),transform 700ms var(--ease-expo)}
+.is-ready .nav__item:nth-child(2){transition-delay:40ms}
+.is-ready .nav__item:nth-child(3){transition-delay:80ms}
+.is-ready .nav__item:nth-child(4){transition-delay:120ms}
+.is-ready .stage video,.is-ready .stage canvas{filter:none;scale:1;transition:filter 1600ms var(--ease-expo),scale 1600ms var(--ease-expo),opacity 240ms linear}
+.is-settled .hero__drop,.is-settled .hero__scroll{transition:none}
+
+/* ─────────────────────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────────────────────── */
+@media (max-width:1023px){
+  .nav__links,.nav__hide-m{display:none}
+  .nav__menu{display:block}
+  .nav{grid-template-columns:auto 1fr auto}
+  .nav__clock{justify-self:center}
+}
+@media (max-width:767px){
+  :root{
+    --fs-logo:48vw;
+    --fs-h2:12.8vw;
+    --fs-body:13px;
+    --slot-w:calc(100vw - 2 * var(--pad));
+    --slot-r:20px;
+    --runway:480vh;
+  }
+  .nav__clock{display:none}
+  .nav{grid-template-columns:1fr auto}
+  .hero__title{bottom:calc(env(safe-area-inset-bottom) + 52px - 0.076 * var(--fs-logo))}
+  .hero__tag{font-size:12px}
+  .hero__drop,.hero__scroll{bottom:calc(20px + env(safe-area-inset-bottom))}
+  .m-head{top:calc(var(--top) + 44px)}
+  .m-drop{display:none}
+  /* portrait window on phones: a 3:4 crop keeps the whole figure */
+  :root{--slot-w:62vw;--m-slot-top:calc(var(--top) + 44px + 1.8 * var(--fs-h2) + 24px)}
+  .m-slot{
+    top:var(--m-slot-top);
+    aspect-ratio:3 / 4;
+    transform:translateX(-50%);
+  }
+  .m-note{
+    top:calc(var(--m-slot-top) + var(--slot-w) * 4 / 3 + 16px);
+    transform:none;
+    width:calc(50vw - var(--pad) - 8px);
+    max-width:none;
+  }
+}
+@media (max-width:767px) and (max-height:740px){
+  :root{--slot-w:50vw}
+}
+@media (max-width:767px) and (max-height:620px){
+  .m-note{display:none}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .exit-3d{transform:none}
+  .exit-3d.is-exiting{filter:none}
+  .rise,.word{translate:none}
+  .rise.is-anim,.word.is-anim{filter:none}
+  .js .logo,.js .nav__item,.js .stage video,.js .stage canvas{filter:none;transform:none;scale:1}
+  .is-ready .logo,.is-ready .nav__item,.is-ready .stage video{transition:opacity 200ms linear}
+}
