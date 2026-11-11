@@ -12,18 +12,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Geist:wght@300;400;500&family=Geist+Mono:wght@400&family=Pinyon+Script&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="assets/poster.jpg">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="shop-look.css">
 </head>
 <body>
 
-<!-- STAGE — hero video. Scrubbed by scroll, then shrinks into the window of block 02 -->
-<div class="stage" id="stage" aria-hidden="true">
-  <video id="v" muted playsinline preload="auto" poster="assets/poster.jpg" tabindex="-1"
-         data-src-desktop="assets/hero-1080.mp4" data-src-mobile="assets/hero-720.mp4"></video>
-  <canvas id="c" class="plate"></canvas>
-  <div class="shade" id="shade"></div>
-</div>
-
-<!-- NAV — stays for the whole page -->
+<!-- NAV — stays for the whole page (difference blend: light on video, dark on white) -->
 <header class="nav">
   <nav class="nav__links" aria-label="Primary">
     <a class="nav__item" href="#shop">Shop</a>
@@ -36,33 +29,50 @@
   <div class="nav__actions">
     <a class="nav__item nav__hide-m" href="#search">Search</a>
     <a class="nav__item nav__hide-m" href="#account">Account</a>
-    <a class="nav__item" href="#bag">Bag (0)</a>
+    <button class="nav__item nav__bag" type="button" data-open-bag aria-label="Open your bag">Bag (<span data-cart-count>0</span>)</button>
   </div>
 </header>
 
-<!-- 01 HERO — type layer -->
-<div class="hero" id="hero">
-  <div class="hero__title exit-3d" id="heroTitle">
-    <p class="hero__tag">Clothing for the after-hours</p>
-    <h1 class="logo" aria-label="AFTR">A<span class="logo__f">f</span>TR<span class="logo__reg">&reg;</span></h1>
+<!-- BLOCKS 01 + 02 — one sticky scene; its height is the scroll runway -->
+<div class="intro" id="runway">
+  <div class="intro__pin" id="pin">
+
+    <!-- STAGE — hero video. Scrubbed by scroll, then shrinks into the window of block 02 -->
+    <div class="stage" id="stage" aria-hidden="true">
+      <video id="v" muted playsinline preload="auto" poster="assets/poster.jpg" tabindex="-1"
+             data-src-desktop="assets/hero-1080.mp4" data-src-mobile="assets/hero-720.mp4"></video>
+      <canvas id="c" class="plate"></canvas>
+      <div class="shade" id="shade"></div>
+    </div>
+
+    <!-- 01 HERO — type layer -->
+    <div class="hero" id="hero">
+      <div class="hero__title exit-3d" id="heroTitle">
+        <p class="hero__tag">Clothing for the after-hours</p>
+        <h1 class="logo" aria-label="AFTR">A<span class="logo__f">f</span>TR<span class="logo__reg">&reg;</span></h1>
+      </div>
+      <p class="label hero__drop fade-out" id="heroDrop">[ Drop 01 — SS27 ]</p>
+      <p class="label hero__scroll fade-out" id="heroScroll">[ Scroll ]</p>
+    </div>
+
+    <!-- 02 MANIFESTO — the video ends up in .m-slot -->
+    <section class="manifesto" id="manifesto" aria-label="Manifesto">
+      <h2 class="h2 m-head rise" id="mHead">Made for the<br>last train</h2>
+      <a class="label m-drop rise" id="mDrop" href="#looks">&#8627;&nbsp;Shop the drop</a>
+      <div class="m-slot" id="slot" aria-hidden="true"></div>
+      <p class="m-note m-note--l rise" data-note>We started with one rule: if it doesn&rsquo;t survive a night out, it doesn&rsquo;t leave the studio.</p>
+      <p class="m-note m-note--r rise" data-note>Small runs. Raw edges. Colours that change under every streetlight.</p>
+      <p class="h2 m-statement" id="mStatement">Cut slow<br>Worn hard<span class="m-script">Made to last</span></p>
+    </section>
+
   </div>
-  <p class="label hero__drop fade-out" id="heroDrop">[ Drop 01 — SS27 ]</p>
-  <p class="label hero__scroll fade-out" id="heroScroll">[ Scroll ]</p>
 </div>
 
-<!-- 02 MANIFESTO — the video ends up in .m-slot -->
-<section class="manifesto" id="manifesto" aria-label="Manifesto">
-  <h2 class="h2 m-head rise" id="mHead">Made for the<br>last train</h2>
-  <a class="label m-drop rise" id="mDrop" href="#shop">&#8627;&nbsp;Shop the drop</a>
-  <div class="m-slot" id="slot" aria-hidden="true"></div>
-  <p class="m-note m-note--l rise" data-note>We started with one rule: if it doesn&rsquo;t survive a night out, it doesn&rsquo;t leave the studio.</p>
-  <p class="m-note m-note--r rise" data-note>Small runs. Raw edges. Colours that change under every streetlight.</p>
-  <p class="h2 m-statement" id="mStatement">Cut slow<br>Worn hard<span class="m-script">Made to last</span></p>
-</section>
-
-<div class="runway" id="runway"></div>
+<!-- 03 SHOP THE LOOK — runway carousel (built by shop-look.js from its data) -->
+<look-runway id="looks" class="rw" data-autoplay="true" data-speed="5000"></look-runway>
 
 <script src="https://cdn.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.min.js" defer></script>
 <script src="main.js" defer></script>
+<script src="shop-look.js" defer></script>
 </body>
 </html>

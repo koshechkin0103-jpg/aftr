@@ -58,7 +58,7 @@ a{color:inherit;text-decoration:none}
    to fold it into the window of block 02. Transform + clip-path only.
    ───────────────────────────────────────────────────────────── */
 .stage{
-  position:fixed;
+  position:absolute;
   inset:0;
   z-index:1;
   overflow:hidden;
@@ -113,8 +113,12 @@ canvas.plate.is-off{opacity:0;transition:none}
   grid-template-columns:1fr auto 1fr;
   align-items:center;
   pointer-events:none;
+  color:#fff;
+  mix-blend-mode:difference;     /* reads light on the video, dark on the white blocks */
 }
 .nav__links,.nav__actions{display:flex;gap:32px}
+.nav__bag{background:none;border:0;padding:0;color:inherit;cursor:pointer;font:inherit}
+.nav__bag [data-cart-count]{font-variant-numeric:tabular-nums}
 .nav__actions{justify-self:end}
 .nav__item{
   font-family:'Geist Mono',ui-monospace,monospace;
@@ -131,14 +135,14 @@ canvas.plate.is-off{opacity:0;transition:none}
 .nav__clock{pointer-events:none;font-variant-numeric:tabular-nums}
 .nav__menu{display:none}
 @media (hover:hover) and (pointer:fine){
-  .nav a.nav__item:hover,.m-drop:hover{opacity:.55}
+  .nav a.nav__item:hover,.nav__bag:hover,.m-drop:hover{opacity:.55}
 }
 
 /* ─────────────────────────────────────────────────────────────
    01 HERO — type over the video
    ───────────────────────────────────────────────────────────── */
 .hero{
-  position:fixed;
+  position:absolute;
   inset:0;
   z-index:20;
   pointer-events:none;
@@ -223,7 +227,7 @@ canvas.plate.is-off{opacity:0;transition:none}
    02 MANIFESTO — fixed layer over the folded video
    ───────────────────────────────────────────────────────────── */
 .manifesto{
-  position:fixed;
+  position:absolute;
   inset:0;
   z-index:10;
   pointer-events:none;
@@ -315,7 +319,11 @@ canvas.plate.is-off{opacity:0;transition:none}
 }
 .word.is-anim{filter:blur(calc((1 - var(--in,0)) * 12px))}
 
-.runway{height:var(--runway)}
+/* Blocks 01+02 live in one sticky scene: the outer box is the scroll runway,
+   the pin holds the screen while it is scrolled through, then lets go so
+   block 03 scrolls in naturally underneath. */
+.intro{position:relative;height:var(--runway)}
+.intro__pin{position:sticky;top:0;height:100vh;overflow:hidden;background:var(--ink)}
 
 /* ─────────────────────────────────────────────────────────────
    ENTRANCE — blur-in on load (PLATE). Rested state is the design.

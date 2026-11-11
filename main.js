@@ -263,7 +263,11 @@ if (document.readyState === 'complete') build(); else addEventListener('load', f
 var span = 0, fold = null, slotR = 28;
 function measure(){
   span = runway.offsetHeight - innerHeight;
-  var r = slot.getBoundingClientRect(), vw = innerWidth, vh = innerHeight;
+  // measured relative to the sticky pin, so it is right even when the page
+  // is scrolled past the intro (resize while reading block 03)
+  var pr = document.getElementById('pin').getBoundingClientRect();
+  var sr = slot.getBoundingClientRect(), vw = innerWidth, vh = innerHeight;
+  var r = { left:sr.left - pr.left, top:sr.top - pr.top, width:sr.width, height:sr.height };
   var k = Math.max(r.width / vw, r.height / vh);
   var ix = (vw - r.width / k) / 2, iy = (vh - r.height / k) / 2;
   /* The visible region of the stage once folded is (vw-2ix)×(vh-2iy). On a
@@ -278,7 +282,7 @@ function measure(){
   slotR = parseFloat(getComputedStyle(root).getPropertyValue('--slot-r')) || 28;
   last.fold = -1;
 }
-function progress(){ return span > 0 ? clamp01(scrollY / span) : 0; }
+function progress(){ return span > 0 ? clamp01((scrollY - runway.offsetTop) / span) : 0; }
 
 /* ── writers (each skips when its value hasn't changed) ───────── */
 var last = { exit:-1, out:-1, fold:-1, head:-1, drop:-1, notes:[], words:[], man:null };
