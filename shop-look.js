@@ -145,8 +145,7 @@ function build(){
 
   /* panel */
   h += '<div class="rw__panel"><div class="rw__panel-inner">';
-  h += '<div class="rw__panel-head"><p class="rw__panel-title rw__mono" data-rw-ptitle>In this look&nbsp;&nbsp;—&nbsp;&nbsp;01 ' + esc(LOOKS[0].name) + '</p><span class="rw__label rw__mono" data-rw-pieces>' + LOOKS[0].pieces.length + ' pieces</span>' +
-       '<button class="rw__panel-close" type="button" data-rw-panel-close aria-label="Close look details">' + SVG.close + '</button></div>';
+  h += '<div class="rw__panel-head"><p class="rw__panel-title rw__mono" data-rw-ptitle>In this look&nbsp;&nbsp;—&nbsp;&nbsp;01 ' + esc(LOOKS[0].name) + '</p><span class="rw__label rw__mono" data-rw-pieces>' + LOOKS[0].pieces.length + ' pieces</span></div>';
   LOOKS.forEach(function(look, i){
     var b = bundle(look);
     h += '<div class="rw__look-panel' + (i === 0 ? ' is-in' : '') + '" data-rw-panel="' + i + '"' + (i ? ' hidden' : '') + '>';
@@ -298,10 +297,6 @@ class LookRunway extends HTMLElement {
     this.lb      = q('[data-rw-lb]');
     this.lbStage = q('[data-rw-lb-stage]');
     this.cursor  = q('[data-rw-cursor]');
-    this.controls= q('.rw__controls');
-    this.panelEl = q('.rw__panel');
-    this.open = 0; this.openT = 0; this.openV = 0;
-    if (innerWidth >= 750) this.panelEl.setAttribute('aria-hidden', 'true');
 
     /* 12 bodies: clone the six so the ring is always full */
     var originals = qa('[data-rw-model]');
@@ -365,7 +360,6 @@ class LookRunway extends HTMLElement {
       if (e.key === 'Escape'){
         if (self.openSheet){ var btn = self.openSheet.closest('.rw__item') ; self.closeSheet(); if (btn) btn.querySelector('[data-rw-add]').focus(); }
         else if (self.zoomed) self.closeZoom();
-        else if (self.openT) self.closePanel();
       }
     });
     this.stage.addEventListener('keydown', function(e){
@@ -392,11 +386,7 @@ class LookRunway extends HTMLElement {
     }
     this.style.setProperty('--rw-frame-h', Math.round(frameH) + 'px');
     var r = this.stage.getBoundingClientRect();
-    this.Wfull = r.width; this.H = r.height;
-    this.W = mob ? this.Wfull : this.Wfull - (this.open || 0) * (this.panelW || 0);
-    this.panelW = mob ? 0 : (parseFloat(getComputedStyle(this).getPropertyValue('--rw-panel-w')) || 400);
-    this.ctrlPad = this.ctrlPad || parseFloat(getComputedStyle(this.controls).paddingRight) || 40;
-    if (mob && this.openT){ this.openT = 0; this.open = 0; this.classList.remove('rw--panel'); }
+    this.W = r.width; this.H = r.height;
     var ring = this.mode === 'ring';
     this.fs = ring ? 1.08 : 1;
     this.style.setProperty('--rw-fs', this.fs);
@@ -415,50 +405,8 @@ class LookRunway extends HTMLElement {
       this.bodies.forEach(function(b){ b.x = b.g = b.goal = self.wrapN(b.a - self.target); b.v = 0; b.trip = false; });
       if (!mob) this.dockAll();
     }
-    this.applyOpen();
     if (!first) this.renderAll();
     this.kick();
-  }
-
-  /* ── look panel: hidden until a model is clicked (desktop) ──
-     The models use the full width; opening the panel slides it in from the
-     right while the runway re-centres in the space that is left. */
-  openPanel(){
-    if (this.mob) return;
-    this.openT = 1;
-    this.classList.add('rw--panel');
-    this.panelEl.setAttribute('aria-hidden', 'false');
-    this.restartBar();
-    this.kick();
-  }
-  closePanel(){
-    if (!this.openT) return;
-    this.openT = 0;
-    this.classList.remove('rw--panel');
-    this.panelEl.setAttribute('aria-hidden', 'true');
-    if (this.panelEl.contains(document.activeElement)) this.stage.focus({ preventScroll:true });
-    this.hot(0);
-    this.restartBar();
-    this.kick();
-  }
-  stepOpen(dt){
-    var tgt = this.openT || 0;
-    if (this.reduced || this.mob){ this.open = tgt; this.openV = 0; return false; }
-    if (Math.abs((this.open || 0) - tgt) < 0.001 && Math.abs(this.openV || 0) < 0.001){ this.open = tgt; this.openV = 0; return false; }
-    var k = 70, c = 2 * Math.sqrt(k), h = dt / 3;
-    for (var i = 0; i < 3; i++){ var a = -k * (this.open - tgt) - c * this.openV; this.openV += a * h; this.open += this.openV * h; }
-    return true;
-  }
-  applyOpen(){
-    var o = this.mob ? 0 : (this.open || 0);
-    this.W = this.Wfull - o * this.panelW;
-    var ring = this.mode === 'ring';
-    this.hx = ring ? 0.5 * this.W : 0.3 * this.W;
-    this.stage.style.setProperty('--rw-hx', this.hx.toFixed(1) + 'px');
-    this.unit = ring ? Math.max(120, 0.3 * this.W) : Math.max(90, this.W * 0.32 * 1.6);
-    this.style.setProperty('--rw-open', o.toFixed(4));
-    this.panelEl.style.visibility = this.mob || o > 0.002 ? '' : 'hidden';
-    this.controls.style.paddingRight = this.mob ? '' : (this.ctrlPad + o * this.panelW).toFixed(1) + 'px';
   }
 
   /* ── loop ── */
@@ -471,10 +419,8 @@ class LookRunway extends HTMLElement {
     this.raf = 0;
     var dt = this.lt ? Math.min(0.034, (t - this.lt) / 1000) : 1 / 60;
     this.lt = t;
-    var opening = this.stepOpen(dt);
-    if (opening || this._lastOpen !== this.open){ this._lastOpen = this.open; this.applyOpen(); }
     var moving = this.mode === 'ring' ? this.stepRing(dt) : this.stepClassic(dt);
-    moving = moving || this.dragging || opening;
+    moving = moving || this.dragging;
     this.setStill(!moving);
     this.renderAll();
     if (moving && this.visible && !document.hidden) this.raf = requestAnimationFrame(this.frame);
@@ -637,7 +583,7 @@ class LookRunway extends HTMLElement {
     void this.offsetWidth;
     if (this.ticks[this.index]) this.ticks[this.index].classList.add('is-run');
     this.timer = setTimeout(function(){
-      if (self.playing && self.visible && !self.dragging && !document.hidden && !self.panelHover && !self.zoomed && !self.openT && !self.engaged) self.next();
+      if (self.playing && self.visible && !self.dragging && !document.hidden && !self.panelHover && !self.zoomed && !self.engaged) self.next();
       else self.restartBar();
     }, this.speed);
   }
@@ -766,8 +712,7 @@ class LookRunway extends HTMLElement {
     if ((el = t.closest('[data-rw-pick-close]'))){ this.closePicker(el.closest('[data-rw-picker]')); return; }
     if (t.closest('[data-rw-zoom-close]')){ this.closeZoom(); return; }
     if (this.zoomed && (t === this.lbStage || t === this.lb || t.closest('.rw__lb') && !t.closest('.rw__lb-model, .rw__lb-top'))){ this.closeZoom(); return; }
-    if (t.closest('[data-rw-panel-close]')){ this.closePanel(); return; }
-    if (t.closest('[data-rw-zoom]')){ if (this.mob) this.openZoom(); else this.openPanel(); return; }
+    if (t.closest('[data-rw-zoom]')){ this.openZoom(); return; }
     if (t.closest('[data-rw-next]')){ this.next(); return; }
     if (t.closest('[data-rw-prev]')){ this.prev(); return; }
     if ((el = t.closest('[data-rw-tick]'))){ this.go(+el.dataset.rwTick); return; }
@@ -775,9 +720,7 @@ class LookRunway extends HTMLElement {
     if ((el = t.closest('[data-rw-pin]'))){ this.engage(); this.hot(+el.dataset.rwPin, true); return; }
     if ((el = t.closest('[data-rw-go]'))){
       var b = this.bodies.find(function(x){ return x.hit === el; }), k = this.rank(b);
-      if (k !== 0 && Math.abs(k) < this.N / 2) this.moveTo(Math.round(this.target) + k);
-      if (this.mob){ if (k === 0) this.openZoom(); }
-      else this.openPanel();          // desktop: bring that look to the front and open its panel
+      if (k !== 0 && Math.abs(k) < this.N / 2) this.moveTo(Math.round(this.target) + k); else this.openZoom();
       return;
     }
     if ((el = t.closest('[data-rw-confirm]'))){ this.confirm(el.closest('[data-rw-picker]')); return; }
