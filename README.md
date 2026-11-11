@@ -27,7 +27,7 @@ ffmpeg -i source.mp4 -an -vf scale=1280:-2 -c:v libx264 -crf 24 -g 4 -keyint_min
 To replace the video, re-encode the new clip with the same commands and swap the files.
 
 ## Block 03 — Shop the Look
-`shop-look.js` / `shop-look.css` define the `<look-runway>` element. On desktop the looks stand on a 3D ring; on phones they walk along a diagonal line. Looks change every 5 s, by dragging, with the arrows or with the keys. The front model opens a "View look" popup with numbered pins. The "In this look" panel has size pickers (a bottom sheet on phones), "Add full look to bag" and a local styling bag (localStorage).
+`shop-look.js` / `shop-look.css` define the `<look-runway>` element. On desktop the looks stand on a 3D ring; on phones they walk along a diagonal line. Looks change every 5 s, by dragging, with the arrows or with the keys. On desktop the models use the full width. Clicking a model brings that look to the front, the runway slides left, and the "In this look" panel slides in from the right with a × to close it; the numbered pins on the model link to the rows. On phones the panel stays docked under the runway, and the front model opens the "View look" popup. The panel has size pickers (a bottom sheet on phones), "Add full look to bag" and a local styling bag (localStorage).
 
 The models and product photos are placeholders from the reference. To swap them, edit `LOOKS` and `PRODUCTS` at the top of `shop-look.js`. Bottoms have no product photo yet, so their thumbnails are a crop of the model's legs.
 
