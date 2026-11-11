@@ -1,0 +1,99 @@
+/* ─────────────────────────────────────────────────────────────
+   06 NEXT DROP (newsletter) + 07 FOOTER — from the AFTR Figma.
+   ───────────────────────────────────────────────────────────── */
+
+/* ── 06 NEXT DROP ─────────────────────────────────────────────── */
+.drop{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:96px var(--pad) 126px;
+  background:var(--paper);color:var(--ink);
+}
+.drop__eyebrow{color:var(--red);margin:0}
+.drop__title{margin:30px 0 0}
+.drop__date{color:var(--red)}
+.drop__lead{margin:44px 0 0;font-weight:300;font-size:clamp(17px,1.3889vw,22px);line-height:1.35;letter-spacing:-.01em}
+.drop__form{display:flex;margin-top:33px;width:min(566px,100%)}
+.drop__field{flex:1 1 auto;display:flex}
+.drop__input{
+  flex:1 1 auto;min-width:0;height:62px;padding:0 20px;
+  border:1px solid var(--ink);border-radius:0;background:#fff;color:var(--ink);
+  font-family:'Geist Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.04em;
+  outline:none;transition:border-color .3s;
+}
+.drop__input::placeholder{color:var(--grey);text-transform:uppercase;opacity:1}
+.drop__input:focus-visible{box-shadow:inset 0 0 0 1px var(--ink)}
+.drop__btn{height:62px;flex:0 0 auto;border:0;cursor:pointer}
+.drop__note{margin:28px 0 0;color:var(--grey);transition:color .3s}
+.drop.is-error .drop__input{border-color:var(--red);box-shadow:inset 0 0 0 1px var(--red)}
+.drop.is-error .drop__note{color:var(--red)}
+.drop.is-done .drop__btn{background:var(--red);cursor:default}
+.drop.is-done .drop__btn:hover{transform:none}
+.drop.is-done .btn__arrow{display:none}
+.drop.is-done .drop__note{color:var(--ink)}
+.drop.is-shake .drop__form{animation:drop-shake .45s cubic-bezier(.36,.07,.19,.97)}
+@keyframes drop-shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+/* ── 07 FOOTER ────────────────────────────────────────────────── */
+/* the fixed nav steps aside over the footer (end.js toggles .is-away) */
+.nav{transition:opacity .45s var(--ease-expo),transform .6s var(--ease-expo)}
+.nav.is-away{opacity:0;transform:translateY(-12px);pointer-events:none}
+.nav.is-away *{pointer-events:none}
+.foot{
+  position:relative;z-index:2;
+  container-type:inline-size;
+  height:calc(960 / 1440 * 100vw);
+  overflow:hidden;
+  background:var(--ink);color:var(--paper);
+}
+.foot a{color:inherit;transition:opacity .2s}
+@media (hover:hover){.foot a:hover{opacity:.55}}
+.foot__tag{
+  position:absolute;left:2.7778cqw;top:5.5556cqw;margin:0;
+  font-weight:300;font-size:clamp(16px,1.3889cqw,22px);line-height:1.35;letter-spacing:-.01em;
+}
+.foot__col{position:absolute;top:5.8333cqw;display:flex;flex-direction:column;gap:10px;font-size:15px;line-height:1.45}
+.foot__col:nth-child(1){left:52.7778cqw}
+.foot__col:nth-child(2){left:68.0556cqw}
+.foot__col:nth-child(3){left:83.3333cqw}
+.foot__h{margin:0 0 0;color:var(--grey)}
+.foot__legal{
+  position:absolute;left:2.7778cqw;right:2.7778cqw;top:18.75cqw;
+  display:flex;justify-content:space-between;gap:16px;
+  padding-top:17px;border-top:1px solid #404040;
+}
+.foot__clock{font-variant-numeric:tabular-nums}
+
+/* giant wordmark bleeding off the bottom; rises as the footer arrives */
+.foot__logo{
+  position:absolute;left:5.6944cqw;top:25.5cqw;margin:0;
+  font-size:50cqw;
+  color:var(--paper);
+  transform:translate3d(0,calc(var(--lift,0) * 22cqw),0);
+  will-change:transform;
+}
+.foot__logo .logo__reg{font-size:.2em}
+
+/* ── phones ───────────────────────────────────────────────────── */
+@media (max-width:767px){
+  .drop{padding:72px var(--pad) 80px}
+  .drop__title{margin-top:20px}
+  .drop__lead{margin-top:24px}
+  .drop__form{flex-direction:column;gap:10px;margin-top:28px}
+  .drop__btn{justify-content:space-between}
+  .drop__note{margin-top:20px}
+
+  .foot{height:auto;padding:56px var(--pad) 0;display:flex;flex-direction:column}
+  .foot__tag,.foot__col,.foot__legal,.foot__logo{position:static}
+  .foot__cols{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+  .foot__col{font-size:14px}
+  .foot__legal{flex-wrap:wrap;margin-top:40px;row-gap:12px;font-size:10px}
+  .foot__legal > *{flex:0 0 calc(50% - 8px)}
+  .foot__legal > :nth-child(even){text-align:right}
+  .foot__logo{margin:36px 0 -9vw -1vw;font-size:46vw;align-self:flex-start}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .foot__logo{transform:none}
+  .drop.is-shake .drop__form{animation:none}
+}

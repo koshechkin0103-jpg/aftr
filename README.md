@@ -1,6 +1,6 @@
 # AFTR — clothing for the after-hours
 
-Concept site for a unisex clothing brand. Built so far: blocks 01–05 of the home page.
+Concept site for a unisex clothing brand. The whole home page is built: blocks 01–07.
 
 - **01 Hero.** A full-screen video plays frame by frame as you scroll. The AFTR® logo exits forward in 3D (it grows, sinks and blurs).
 - **02 Manifesto.** The same video folds into a window in the centre. The heading, the margin notes and the statement *Cut slow / Worn hard / Made to last* appear in sequence. The statement types in word by word.
@@ -44,3 +44,8 @@ GitHub Pages lets browsers cache files for 10 minutes. Every CSS/JS link in `ind
 ```
 V=$(date +%Y%m%d%H%M); sed -i -E "s#\.(css|js)\?v=[0-9]+#.\1?v=$V#g" index.html
 ```
+
+## Blocks 06–07 — Next drop + Footer
+`end.css` / `end.js`.
+- **06 Next drop.** The newsletter block from Figma ("[ Drop 02 ]" and the "12.12" in red). The form checks the email and shows an error or a joined state, but **nothing is sent yet**: no mailing service is connected.
+- **07 Footer.** Tagline, Shop / Help / Follow links, and a legal row with a live local clock and "Back to top". A giant AFTR® wordmark bleeds off the bottom edge and rises into place as the footer scrolls in. The fixed nav steps aside over the footer, which has its own links.
