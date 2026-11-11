@@ -5,7 +5,8 @@
    grid scales as one piece. Phones get a simple two-column flow.
 
    Photo drift (after cyphr.studio): each photo is 20% wider than its
-   frame and slides right→left as the frame crosses the viewport.
+   frame and slides sideways as the frame crosses the viewport —
+   photos in the left half of the screen move right, the right half left.
    JS writes --drift 0→1 per frame; transform only.
    ───────────────────────────────────────────────────────────── */
 .her{
@@ -70,6 +71,9 @@
   transform:translate3d(calc(var(--drift,0) * -16.6667%),0,0);
   will-change:transform;
 }
+/* Left half of the screen drifts →, right half (incl. Clear Tote) drifts ←.
+   "right": starts showing the photo's right side, ends on its left side. */
+.her-card__frame[data-drift="right"] img{transform:translate3d(calc((var(--drift,0) - 1) * 16.6667%),0,0)}
 .her-card__row{display:flex;justify-content:space-between;gap:12px;font-size:15px;line-height:1.3}
 .her-card__cat{color:var(--grey)}
 .her-card__name{
