@@ -1,6 +1,6 @@
 # AFTR — clothing for the after-hours
 
-Concept site for a unisex clothing brand. Built so far: blocks 01–03 of the home page.
+Concept site for a unisex clothing brand. Built so far: blocks 01–04 of the home page.
 
 - **01 Hero.** A full-screen video plays frame by frame as you scroll. The AFTR® logo exits forward in 3D (it grows, sinks and blurs).
 - **02 Manifesto.** The same video folds into a window in the centre. The heading, the margin notes and the statement *Cut slow / Worn hard / Made to last* appear in sequence. The statement types in word by word.
@@ -30,3 +30,6 @@ To replace the video, re-encode the new clip with the same commands and swap the
 `shop-look.js` / `shop-look.css` define the `<look-runway>` element. On desktop the looks stand on a 3D ring; on phones they walk along a diagonal line. Looks change every 5 s, by dragging, with the arrows or with the keys. The front model opens a "View look" popup with numbered pins. The "In this look" panel has size pickers (a bottom sheet on phones), "Add full look to bag" and a local styling bag (localStorage).
 
 The models and product photos are placeholders from the reference. To swap them, edit `LOOKS` and `PRODUCTS` at the top of `shop-look.js`. Bottoms have no product photo yet, so their thumbnails are a crop of the model's legs.
+
+## Block 04 — Her Things
+`her-things.css` / `her-things.js`. These are the six pieces the girl wears in the film, laid out in the asymmetric Figma grid. Desktop positions are the Figma 1440 px values in `cqw`, so the grid scales as one piece; phones get a two-column flow. Each photo is 20% wider than its frame and drifts right to left as the frame scrolls through the viewport, like the photos on cyphr.studio. The photos in `assets/her/` are low-res placeholders cut from the moodboard.

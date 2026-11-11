@@ -13,6 +13,7 @@
 <link rel="preload" as="image" href="assets/poster.jpg">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="shop-look.css">
+<link rel="stylesheet" href="her-things.css">
 </head>
 <body>
 
@@ -71,8 +72,62 @@
 <!-- 03 SHOP THE LOOK — runway carousel (built by shop-look.js from its data) -->
 <look-runway id="looks" class="rw" data-autoplay="true" data-speed="5000"></look-runway>
 
+<!-- 04 HER THINGS — what she wore in the film. Photos drift right→left inside their frames on scroll -->
+<section class="her" id="her-things" aria-labelledby="herTitle">
+  <p class="label her__eyebrow ht-rise">[ Seen in the film — 06 pieces ]</p>
+  <h2 class="h2 her__title ht-rise" id="herTitle">Her Things</h2>
+  <p class="her__lead ht-rise">Everything she left the house with. Six pieces from the film &mdash; cut, dyed and finished in our studio, numbered by hand.</p>
+  <a class="btn her__btn ht-rise" href="#shop"><span>Shop all accessories</span><span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+
+  <ul class="her__grid" role="list">
+    <li class="her-card her-card--tank ht-rise">
+      <a class="her-card__link" href="#shop" aria-label="Cutout Tank, $140">
+        <span class="her-card__frame" data-drift><img src="assets/her/tank.jpg" width="260" height="386" alt="Pastel tie-dye cutout tank" loading="lazy" decoding="async"></span>
+        <span class="her-card__row"><span class="her-card__name">Cutout Tank</span><span class="her-card__price">$140</span></span>
+        <span class="label her-card__cat">Apparel · 01/06</span>
+      </a>
+    </li>
+    <li class="her-card her-card--cuff ht-rise">
+      <a class="her-card__link" href="#shop" aria-label="Chain Cuff, $160">
+        <span class="her-card__frame" data-drift><img src="assets/her/cuff.jpg" width="260" height="260" alt="Silver chain cuff" loading="lazy" decoding="async"></span>
+        <span class="her-card__row"><span class="her-card__name">Chain Cuff</span><span class="her-card__price">$160</span></span>
+        <span class="label her-card__cat">Jewelry · 02/06</span>
+      </a>
+    </li>
+    <li class="her-card her-card--jeans ht-rise">
+      <a class="her-card__link" href="#shop" aria-label="Wash Jeans, $220">
+        <span class="her-card__frame" data-drift><img src="assets/her/jeans.jpg" width="640" height="640" alt="Pastel washed ripped jeans" loading="lazy" decoding="async"></span>
+        <span class="her-card__row"><span class="her-card__name">Wash Jeans</span><span class="her-card__price">$220</span></span>
+        <span class="label her-card__cat">Denim · 03/06</span>
+      </a>
+    </li>
+    <li class="her-card her-card--shield ht-rise">
+      <a class="her-card__link" href="#shop" aria-label="Clear Shield, $90">
+        <span class="her-card__frame" data-drift><img src="assets/her/shield.jpg" width="260" height="260" alt="Clear shield sunglasses" loading="lazy" decoding="async"></span>
+        <span class="her-card__row"><span class="her-card__name">Clear Shield</span><span class="her-card__price">$90</span></span>
+        <span class="label her-card__cat">Eyewear · 04/06</span>
+      </a>
+    </li>
+    <li class="her-card her-card--tote ht-rise">
+      <a class="her-card__link" href="#shop" aria-label="Clear Tote, $180">
+        <span class="her-card__frame" data-drift><img src="assets/her/tote.jpg" width="260" height="390" alt="Clear tote bag with iridescent handles" loading="lazy" decoding="async"></span>
+        <span class="her-card__row"><span class="her-card__name">Clear Tote</span><span class="her-card__price">$180</span></span>
+        <span class="label her-card__cat">Bags · 05/06</span>
+      </a>
+    </li>
+    <li class="her-card her-card--hat ht-rise">
+      <a class="her-card__link" href="#shop" aria-label="Bucket Hat, $110">
+        <span class="her-card__frame" data-drift><img src="assets/her/hat.jpg" width="260" height="260" alt="Silver bucket hat" loading="lazy" decoding="async"></span>
+        <span class="her-card__row"><span class="her-card__name">Bucket Hat</span><span class="her-card__price">$110</span></span>
+        <span class="label her-card__cat">Headwear · 06/06</span>
+      </a>
+    </li>
+  </ul>
+</section>
+
 <script src="https://cdn.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.min.js" defer></script>
 <script src="main.js" defer></script>
 <script src="shop-look.js" defer></script>
+<script src="her-things.js" defer></script>
 </body>
 </html>
