@@ -13,7 +13,8 @@
   --fs-label:12px;                           /* Geist Mono, caps, +4% */
   --fs-tag:clamp(13px, 1.3889vw, 22px);      /* 20px @1440, Geist Light */
   --fs-logo:27.7778vw;                       /* 400px @1440, Anton */
-  --fs-h2:min(6.6667vw, 10.6667vh);          /* 96px @1440x900, Anton */
+  --fs-h2:min(6.6667vw, 9.2vh);              /* 96px @1440 wide; shrinks on short (16:9) screens so the window keeps its air */
+  --red:#E33737;
   --fs-body:clamp(14px, 1.0417vw, 17px);     /* 15px @1440 */
 
   --slot-w:30.5556vw;                        /* 440px @1440 */
@@ -67,15 +68,19 @@ a{color:inherit;text-decoration:none}
   will-change:transform, clip-path;
   background:#000;
 }
+/* Media box = the whole 16:9 frame at "cover" size, centred (not object-fit,
+   so the frame outside the viewport still exists and can be revealed when
+   the media zooms out — --vz < 1 while folding on portrait screens). */
 .stage video,
 .stage canvas{
   position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
+  left:50%;
+  top:50%;
+  width:max(100%, 177.7778vh);
+  height:max(56.25vw, 100%);
   object-fit:cover;
-  object-position:50% 50%;
   display:block;
+  transform:translate(-50%,-50%) scale(var(--vz,1));
 }
 canvas.plate{opacity:0;transition:opacity 240ms linear}
 canvas.plate.is-live{opacity:1}
@@ -223,6 +228,18 @@ canvas.plate.is-off{opacity:0;transition:none}
   z-index:10;
   pointer-events:none;
   visibility:hidden;
+
+  /* Vertical rhythm (Figma): heading · gap · window · gap · statement.
+     The window takes whatever height is left between the gaps, capped at
+     its Figma size (440×280 @1440), and is centred in that band. */
+  --head-b:calc(var(--top) + 56px + 1.8 * var(--fs-h2));       /* heading bottom */
+  --stmt-h:calc(2.58 * var(--fs-h2));                           /* 2 Anton lines + script line */
+  --stmt-b:calc(var(--pad) + env(safe-area-inset-bottom));      /* statement bottom offset */
+  --gap:clamp(32px, 7vh, 72px);                                 /* 70px @1440x1000 in Figma */
+  --band-top:calc(var(--head-b) + var(--gap));
+  --band-bot:calc(100vh - var(--stmt-b) - var(--stmt-h) - var(--gap));
+  --slot-h:max(120px, min(19.4444vw, calc(var(--band-bot) - var(--band-top))));
+  --slot-cy:calc((var(--band-top) + var(--band-bot)) / 2);
 }
 .manifesto.is-on{visibility:visible}
 .manifesto a{pointer-events:auto}
@@ -243,15 +260,15 @@ canvas.plate.is-off{opacity:0;transition:none}
 .m-slot{
   position:absolute;
   left:50%;
-  top:calc(50% - 4vh);
-  width:var(--slot-w);
-  aspect-ratio:440 / 280;
-  transform:translate(-50%,-50%);
+  top:calc(var(--slot-cy) - var(--slot-h) / 2);
+  height:var(--slot-h);
+  width:calc(var(--slot-h) * 440 / 280);
+  transform:translateX(-50%);
 }
 
 .m-note{
   position:absolute;
-  top:calc(50% - 4vh);
+  top:var(--slot-cy);
   transform:translateY(-50%);
   width:19.4444vw;               /* 280px @1440 */
   max-width:300px;
@@ -265,9 +282,23 @@ canvas.plate.is-off{opacity:0;transition:none}
 .m-statement{
   position:absolute;
   left:0;right:0;
-  bottom:calc(var(--pad) + env(safe-area-inset-bottom));
+  bottom:var(--stmt-b);
   text-align:center;
 }
+/* Figma: "Made to last" — Pinyon Script at 2× the H2, line-height 39%, red.
+   Its own block line, so the tight leading pulls it up over WORN HARD. */
+.m-script{
+  display:block;
+  font-family:'Pinyon Script',cursive;
+  font-size:2em;
+  line-height:0.39;
+  text-transform:none;
+  color:var(--red);
+  position:relative;
+  z-index:1;
+  white-space:nowrap;
+}
+.m-drop{color:var(--red)}
 
 /* RISE — scroll-driven entrance: --in 0 (below, blurred, hidden) → 1 */
 .rise{
@@ -329,10 +360,13 @@ canvas.plate.is-off{opacity:0;transition:none}
   .hero__drop,.hero__scroll{bottom:calc(20px + env(safe-area-inset-bottom))}
   .m-head{top:calc(var(--top) + 44px)}
   .m-drop{display:none}
+  .m-script{font-size:1.55em;line-height:0.5}
   /* portrait window on phones: a 3:4 crop keeps the whole figure */
   :root{--slot-w:62vw;--m-slot-top:calc(var(--top) + 44px + 1.8 * var(--fs-h2) + 24px)}
   .m-slot{
     top:var(--m-slot-top);
+    width:var(--slot-w);
+    height:auto;
     aspect-ratio:3 / 4;
     transform:translateX(-50%);
   }

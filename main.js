@@ -11,7 +11,7 @@
      0.50 → 0.60  heading rises in
      0.55 → 0.70  margin notes rise in (staggered)
      0.60 → 0.84  statement types in word by word
-     0.55 → 1.00  video loops inside the window
+     0.55 → 1.00  video holds its last frame inside the window
 */
 (function(){
 'use strict';
@@ -78,20 +78,23 @@ setTimeout(showPage, 2500);
 
 /* ── statement: split into words, keep the hand-set <br>s ─────── */
 var words = [];
-(function(){
-  var nodes = [].slice.call(stmt.childNodes);
-  stmt.textContent = '';
+(function split(el){
+  var nodes = [].slice.call(el.childNodes);
+  el.textContent = '';
   nodes.forEach(function(n){
     if (n.nodeType === 3){
       n.textContent.split(/(\s+)/).forEach(function(part){
         if (!part) return;
-        if (/^\s+$/.test(part)){ stmt.appendChild(document.createTextNode(' ')); return; }
+        if (/^\s+$/.test(part)){ el.appendChild(document.createTextNode(' ')); return; }
         var s = document.createElement('span'); s.className = 'word'; s.textContent = part;
-        stmt.appendChild(s); words.push(s);
+        el.appendChild(s); words.push(s);
       });
-    } else stmt.appendChild(n);
+    } else {
+      el.appendChild(n);
+      if (n.nodeType === 1 && n.childNodes.length) split(n);   // e.g. the script line
+    }
   });
-})();
+})(stmt);
 
 /* ── clip: scrubbed <video> + WebCodecs frame bank ────────────────
    The bank is progressive enhancement: decode the whole clip once into
@@ -262,7 +265,15 @@ function measure(){
   span = runway.offsetHeight - innerHeight;
   var r = slot.getBoundingClientRect(), vw = innerWidth, vh = innerHeight;
   var k = Math.max(r.width / vw, r.height / vh);
-  fold = { k:k, ix:(vw - r.width / k) / 2, iy:(vh - r.height / k) / 2,
+  var ix = (vw - r.width / k) / 2, iy = (vh - r.height / k) / 2;
+  /* The visible region of the stage once folded is (vw-2ix)×(vh-2iy). On a
+     portrait phone the cover-cropped video would show only a sliver of the
+     frame there, so the media zooms out (vz < 1) just enough to still cover
+     that region. On desktop vz ≈ 1. */
+  var a = (V.videoWidth && V.videoHeight) ? V.videoWidth / V.videoHeight : 16 / 9;
+  var coverW = Math.max(vw, vh * a), coverH = coverW / a;
+  var vz = Math.min(1, Math.max((vw - 2 * ix) / coverW, (vh - 2 * iy) / coverH));
+  fold = { k:k, ix:ix, iy:iy, vz:vz,
            dx:(r.left + r.width / 2) - vw / 2, dy:(r.top + r.height / 2) - vh / 2 };
   slotR = parseFloat(getComputedStyle(root).getPropertyValue('--slot-r')) || 28;
   last.fold = -1;
@@ -306,6 +317,7 @@ function updateFold(p){
   s.setProperty('--ix', (fold.ix * t).toFixed(2) + 'px');
   s.setProperty('--iy', (fold.iy * t).toFixed(2) + 'px');
   s.setProperty('--r',  (slotR * t / kt).toFixed(2) + 'px');
+  s.setProperty('--vz', (1 + (fold.vz - 1) * t).toFixed(4));
   root.style.setProperty('--fold', t);
 }
 
@@ -326,25 +338,9 @@ function updateManifesto(p){
   });
 }
 
-/* ── video: scrub until the fold lands, then loop inside the window ── */
-var looping = false;
+/* ── video: scrub until the fold lands, then hold the last frame ── */
 function updateVideo(p, dt){
   if (!clip.dur) return;
-  var wantLoop = !reduced && p >= FOLD[1];
-  if (wantLoop !== looping){
-    looping = wantLoop;
-    if (looping){
-      C.classList.add('is-off');
-      try { V.currentTime = clip.current; } catch(e){}
-      V.loop = true;
-      var pr = V.play(); if (pr && pr.catch) pr.catch(function(){});
-    } else {
-      V.pause(); V.loop = false;
-      C.classList.remove('is-off');
-      clip.drawnIndex = -1;
-    }
-  }
-  if (looping) return;
   clip.target = clamp01(p / SCRUB_END) * Math.max(0, clip.dur - 0.04);
   if (reduced) clip.current = 0;
   else {
@@ -371,6 +367,7 @@ requestAnimationFrame(tick);
 
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
 addEventListener('load', measure);
+V.addEventListener('loadedmetadata', measure);
 addEventListener('resize', function(){ clearTimeout(measure.t); measure.t = setTimeout(measure, 120); });
 
 /* read-only diagnostics + a way to sample states without scrolling */
