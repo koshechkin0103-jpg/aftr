@@ -1,7 +1,8 @@
-/* AFTR — 05 COLLECTIONS, desktop 3D scene ("the red tunnel").
-   Our own take, not a copy: a wet night platform under a run of thin red
-   tunnel arches (the last-train motif), dust in the light, red pools under
-   the cards. The three chapter cards stand inside the tunnel at different
+/* AFTR — 05 COLLECTIONS, desktop 3D scene.
+   Our own take, kept deliberately light: a dark wet platform with red edge
+   lines running into the distance, dust drifting in the light, red pools
+   under the cards (no arches, no post-processing — those were too heavy).
+   The three chapter cards stand in the scene at different
    depths (real DOM via CSS3DRenderer, so text stays crisp and clickable),
    and the camera flies card to card on scroll:
 
@@ -62,22 +63,15 @@ function path(p){
 
 async function boot(){
   const THREE = await import('three');
-  const [{ CSS3DRenderer, CSS3DObject }, { EffectComposer }, { RenderPass }, { UnrealBloomPass }, { OutputPass }] = await Promise.all([
-    import('three/addons/renderers/CSS3DRenderer.js'),
-    import('three/addons/postprocessing/EffectComposer.js'),
-    import('three/addons/postprocessing/RenderPass.js'),
-    import('three/addons/postprocessing/UnrealBloomPass.js'),
-    import('three/addons/postprocessing/OutputPass.js')
-  ]);
+  const { CSS3DRenderer, CSS3DObject } = await import('three/addons/renderers/CSS3DRenderer.js');
 
   const RED = new THREE.Color('#E33737');
   const DEEP = new THREE.Color('#8c0a08');
   const BG = 0x0b0b0b;
 
-  /* WebGL layer (tunnel). Rendered above screen resolution (supersampling)
-     so the thin neon arcs stay smooth instead of stair-stepping. */
+  /* WebGL layer: just the floor and the dust — light enough for any laptop */
   const renderer = new THREE.WebGLRenderer({ antialias:true, powerPreference:'high-performance' });
-  const DPR = Math.min(2, Math.max(1.5, devicePixelRatio));
+  const DPR = Math.min(devicePixelRatio, 1.5);
   renderer.setPixelRatio(DPR);
   renderer.setClearColor(BG, 1);
   const canvas = renderer.domElement;
@@ -91,7 +85,7 @@ async function boot(){
   pin.appendChild(css.domElement);
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(BG);   // colour-managed (the clear colour is not, through the composer)
+  scene.background = new THREE.Color(BG);
   scene.fog = new THREE.FogExp2(BG, 0.05);
   const cssScene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 90);
@@ -99,7 +93,7 @@ async function boot(){
   /* ── wet platform ── */
   const floorMat = new THREE.ShaderMaterial({
     uniforms:{
-      // shader maths is done in display (sRGB) space, so pass sRGB triplets
+      // the shader writes display (sRGB) values straight to the canvas, so pass sRGB triplets
       uTime:{ value:0 }, uRed:{ value:RED.clone().convertLinearToSRGB() }, uDeep:{ value:DEEP.clone().convertLinearToSRGB() }, uLift:{ value:0 },
       uC0:{ value:new THREE.Vector2(CARDS[0].pos[0], CARDS[0].pos[2]) },
       uC1:{ value:new THREE.Vector2(CARDS[1].pos[0], CARDS[1].pos[2]) },
@@ -119,38 +113,26 @@ async function boot(){
         vec2 p = vW.xz;
         // soft, slow ripples (two octaves, low contrast — no blocky cells)
         float r = n(p * vec2(0.9, 0.3) + vec2(0.0, uTime * 0.12)) * 0.6 + n(p * vec2(2.2, 0.8) - uTime * 0.08) * 0.4;
-        // reflections: a broad centre lane + wide, soft glows under the arch feet
+        float dist = distance(vW, cameraPosition);
+        // the base: a broad centre lane + two red edge lines running into the distance.
+        // The lines are soft-edged and fade out before they get thinner than a pixel,
+        // so they never stair-step or shimmer.
         float lane = exp(-pow(p.x / 2.2, 2.0)) * 0.32;
-        float feet = exp(-pow((abs(p.x) - 4.6) / 1.1, 2.0)) * 0.42;
+        float edgeW = 0.45 + dist * 0.02;
+        float feet = exp(-pow((abs(p.x) - 4.6) / edgeW, 2.0)) * 0.8 * (1.0 - smoothstep(14.0, 36.0, dist));
         float streak = (lane + feet) * (0.6 + 0.4 * r);
         float pools = (pool(p, uC0) + pool(p, uC1) + pool(p, uC2)) * uLift;
         vec3 col = vec3(0.018) + uRed * streak * 0.5 + uDeep * pools * 1.2;
-        float fog = smoothstep(3.0, 40.0, distance(vW, cameraPosition));
-        col = mix(col, vec3(0.043), fog);
-        // ±1/255 dither (in display space): removes 8-bit banding in the dark reds
+        col = mix(col, vec3(0.043), smoothstep(3.0, 40.0, dist));
+        // ±1/255 dither: removes 8-bit banding in the dark reds
         col += (h(gl_FragCoord.xy + fract(uTime)) - 0.5) / 255.0;
-        // the composer works in linear light and OutputPass encodes to sRGB:
-        // hand it linear values so the floor stays as dark as designed
-        col = max(col, 0.0);
-        gl_FragColor = vec4(mix(col / 12.92, pow((col + 0.055) / 1.055, vec3(2.4)), step(0.04045, col)), 1.0);   // exact sRGB → linear
+        gl_FragColor = vec4(max(col, 0.0), 1.0);
       }`
   });
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 100, 1, 1), floorMat);
   floor.rotation.x = -Math.PI / 2;
   floor.position.z = -35;
   scene.add(floor);
-
-  /* ── tunnel arches (fixed: the camera does the travelling) ── */
-  const ARCH_N = 18, GAP = 3.2, RADIUS = 4.6;
-  // one smooth neon tube per arch (many segments); the glow comes from the
-  // bloom pass, not from a second hard-edged "halo" tube
-  const lineGeo = new THREE.TorusGeometry(RADIUS, 0.03, 16, 320, Math.PI);
-  const lineMat = new THREE.MeshBasicMaterial({ color:new THREE.Color('#ff4a3d'), fog:true });
-  for (let i = 0; i < ARCH_N; i++){
-    const m = new THREE.Mesh(lineGeo, lineMat);
-    m.position.z = 5 - i * GAP;
-    scene.add(m);
-  }
 
   /* ── dust ── */
   const DUST = 900;
@@ -189,21 +171,10 @@ async function boot(){
   }
   attach(desktop.matches);
 
-  /* ── post: multisampled HDR render → soft neon bloom → output ── */
-  const rt = new THREE.WebGLRenderTarget(1, 1, { type:THREE.HalfFloatType, samples:4 });
-  const composer = new EffectComposer(renderer, rt);
-  composer.setPixelRatio(DPR);
-  composer.addPass(new RenderPass(scene, camera));
-  // only the neon (bright) glows; the dark floor and fog stay black
-  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.7, 0.45, 0.42);   // strength, radius, threshold
-  composer.addPass(bloom);
-  composer.addPass(new OutputPass());
-
   /* ── sizing, visibility, input ── */
   function resize(){
     const w = pin.clientWidth, h = pin.clientHeight;
     renderer.setSize(w, h, false);
-    composer.setSize(w, h);
     canvas.style.width = '100%'; canvas.style.height = '100%';
     css.setSize(w, h);
     camera.aspect = w / h; camera.updateProjectionMatrix();
@@ -264,14 +235,14 @@ async function boot(){
 
     floorMat.uniforms.uTime.value = t;
     floorMat.uniforms.uLift.value = rise * (1 - out);
-    composer.render();
+    renderer.render(scene, camera);
     css.render(cssScene, camera);
 
-    // adaptive quality: if a weaker GPU can't hold ~45fps, drop the supersampling a notch
+    // adaptive quality: if a weaker GPU can't hold ~45fps, lower the resolution a notch
     perf.n++; perf.sum += dt;
     if (perf.n === 90){
       const avg = perf.sum / perf.n;
-      if (avg > 0.022 && dpr > 1){ dpr = Math.max(1, dpr - 0.25); renderer.setPixelRatio(dpr); composer.setPixelRatio(dpr); resize(); }
+      if (avg > 0.022 && dpr > 1){ dpr = Math.max(1, dpr - 0.25); renderer.setPixelRatio(dpr); resize(); }
       perf.n = 0; perf.sum = 0;
     }
     raf = requestAnimationFrame(frame);
