@@ -211,18 +211,21 @@ async function boot(){
     look.set(k.look[0] + cx * 0.15, k.look[1], k.look[2]);
     camera.lookAt(look);
 
-    // cards rise out of the floor as the split opens; fade before it closes
-    const rise = smooth(seg(p, 0.16, 0.30));
+    // cards already stand in place when the split opens (fade in with it),
+    // and fade out before it closes
+    const rise = smooth(seg(p, 0.08, 0.22));
     const out = smooth(seg(p, 0.80, 0.86));
-    css.domElement.style.opacity = (1 - out).toFixed(3);
+    css.domElement.style.opacity = (rise * (1 - out)).toFixed(3);
     css.domElement.style.visibility = out >= 1 || rise <= 0 ? 'hidden' : '';
     objs.forEach((o, i) => {
-      const b = o.userData.base, r = smooth(seg(p, 0.16 + i * 0.03, 0.30 + i * 0.03));
-      o.position.set(b[0], b[1] - (1 - r) * 3.2 + Math.sin(t * 0.8 + i * 2) * 0.03, b[2]);
-      // cards further from the camera sink into the dark like the fog does
+      const b = o.userData.base;
+      o.position.set(b[0], b[1] + Math.sin(t * 0.8 + i * 2) * 0.03, b[2]);
+      // depth of field: soft while far, sharp (0 blur) once the camera arrives;
+      // far cards also sink into the dark like the fog does
       const d = camera.position.distanceTo(o.position);
-      const dim = Math.min(0.75, Math.max(0, (d - 5) / 18));
-      const f = 'brightness(' + (1 - dim).toFixed(3) + ')';
+      const blur = Math.min(7, Math.max(0, (d - (VIEW_DIST + 0.6)) * 0.9));
+      const dim = Math.min(0.75, Math.max(0, (d - 6) / 18));
+      const f = (blur > 0.05 ? 'blur(' + blur.toFixed(1) + 'px) ' : '') + 'brightness(' + (1 - dim).toFixed(2) + ')';
       if (o.element.style.filter !== f) o.element.style.filter = f;
     });
 
