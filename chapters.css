@@ -41,6 +41,10 @@
   box-shadow:0 40px 80px -30px rgb(0 0 0/.8);
 }
 .ch.has-3d .ch-card *{pointer-events:auto}
+/* desktop 3D: the halves leave the screen completely during the card tour
+   (and come back when the block closes) */
+.ch.has-3d .ch__panel--l{transform:translate3d(calc(var(--split) * -100%),0,0)}
+.ch.has-3d .ch__panel--r{transform:translate3d(calc(var(--split) * 100%),0,0)}
 @media (max-width:767px){.ch__scene{display:none}}
 
 /* ── the two halves ───────────────────────────────────────────── */

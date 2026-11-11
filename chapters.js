@@ -52,7 +52,9 @@ function update(){
   var p = span > 0 ? clamp01(-r.top / span) : 0;
   if (reduced) p = p > 0.3 ? 1 : 0;
   sec.__p = p;                       // read by the desktop 3D scene (chapters-3d.js)
-  if (sec.classList.contains('has-3d')){
+  // 3D timeline only when the cards really live in the 3D layer; otherwise
+  // (old cached 3D script, failed import…) fall back to the flat version
+  if (sec.classList.contains('has-3d') && sec.querySelector('.ch__css3d [data-ch-card]')){
     /* desktop 3D: open early, fly card to card (chapters-3d.js), close at the end */
     var close = ease(seg(p, .84, .96));
     set(sec, '--fade',  r3(ease(seg(p, .05, .18)) * (1 - ease(seg(p, .88, .98)))), 'f');
