@@ -52,6 +52,15 @@ function update(){
   var p = span > 0 ? clamp01(-r.top / span) : 0;
   if (reduced) p = p > 0.3 ? 1 : 0;
   sec.__p = p;                       // read by the desktop 3D scene (chapters-3d.js)
+  if (sec.classList.contains('has-3d')){
+    /* desktop 3D: open early, fly card to card (chapters-3d.js), close at the end */
+    var close = ease(seg(p, .84, .96));
+    set(sec, '--fade',  r3(ease(seg(p, .05, .18)) * (1 - ease(seg(p, .88, .98)))), 'f');
+    set(sec, '--split', r3(ease(seg(p, .08, .26)) * (1 - close)), 's');
+    set(sec, '--glow',  r3(ease(seg(p, .10, .28)) * (1 - close)), 'g');
+    set(sec, '--ghost', r3(ease(seg(p, .12, .28)) * (1 - close)), 'h');
+    return;
+  }
   set(sec, '--fade',  r3(ease(seg(p, .12, .34))), 'f');
   set(sec, '--split', r3(ease(seg(p, .14, .55))), 's');
   set(sec, '--glow',  r3(ease(seg(p, .18, .58))), 'g');
@@ -66,6 +75,8 @@ function update(){
   });
 }
 function schedule(){ if (!queued){ queued = true; requestAnimationFrame(update); } }
+/* the 3D module toggles .has-3d (different runway + timeline): re-sample */
+new MutationObserver(function(){ last = {}; schedule(); }).observe(sec, { attributes:true, attributeFilter:['class'] });
 addEventListener('scroll', schedule, { passive:true });
 addEventListener('resize', schedule);
 update();

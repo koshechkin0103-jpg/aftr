@@ -31,6 +31,16 @@
 /* desktop 3D scene (chapters-3d.js) replaces the flat glow when it runs */
 .ch__scene{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:var(--glow);pointer-events:none}
 .ch.has-3d .ch__glow{display:none}
+/* desktop 3D: longer runway — open, three card stops, close */
+.ch.has-3d{height:800vh}
+.ch__css3d{position:absolute;inset:0;z-index:3;pointer-events:none}
+.ch__css3d *{pointer-events:none}
+.ch.has-3d .ch-card{
+  width:360px;left:auto!important;top:auto!important;bottom:auto!important;
+  opacity:1;filter:none;pointer-events:auto;
+  box-shadow:0 40px 80px -30px rgb(0 0 0/.8);
+}
+.ch.has-3d .ch-card *{pointer-events:auto}
 @media (max-width:767px){.ch__scene{display:none}}
 
 /* ── the two halves ───────────────────────────────────────────── */
