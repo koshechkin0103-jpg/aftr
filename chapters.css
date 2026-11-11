@@ -1,0 +1,144 @@
+/* ─────────────────────────────────────────────────────────────
+   05 COLLECTIONS — "Three Chapters"
+   Split reveal after meermohsin.me ("Awards & Recognizations"): the
+   pinned closed block is drawn twice, each copy clipped to one half of
+   the screen; on scroll the halves slide apart, the dark wash clears,
+   CHAPTERS ghosts to red, and three chapter cards rise behind it.
+   JS writes --split, --fade, --ghost, --glow on the section and --in
+   per card. Transform / opacity only.
+   ───────────────────────────────────────────────────────────── */
+.ch{
+  position:relative;
+  z-index:2;
+  height:300vh;                 /* scroll runway; the pin holds for 200vh */
+  background:var(--ink);
+  color:#fff;
+  --split:0; --fade:0; --ghost:0; --glow:0;
+  --fs-three:min(13.8889vw, 22.2vh);   /* 200px @1440x900 */
+  --fs-chap:min(20.8333vw, 33.3vh);    /* 300px @1440x900 */
+  --cw:min(25vw, 40vh);                /* card width, 360px @1440x900 */
+}
+.ch__pin{position:sticky;top:0;height:100vh;overflow:hidden}
+
+/* the red room behind the split */
+.ch__glow{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 75% at 50% 45%,#8c0a08 0%,#3a0504 45%,#0b0b0b 80%);
+  opacity:var(--glow);
+  transform:scale(calc(.75 + .25 * var(--glow)));
+}
+
+/* ── the two halves ───────────────────────────────────────────── */
+.ch__panel{position:absolute;top:0;bottom:0;width:50%;overflow:hidden;z-index:2}
+.ch__panel--l{left:0;transform:translate3d(calc(var(--split) * -50%),0,0)}
+.ch__panel--r{left:50%;transform:translate3d(calc(var(--split) * 50%),0,0)}
+.ch__panel::before{          /* the dark wash clears as it opens */
+  content:'';position:absolute;inset:0;background:var(--ink);
+  opacity:calc(1 - var(--glow));
+}
+.ch__closed{position:absolute;top:0;bottom:0;width:200%;left:0}
+.ch__panel--r .ch__closed{left:-100%}
+
+.ch__dates{
+  list-style:none;margin:0;padding:0;
+  position:absolute;left:0;right:0;top:calc(var(--top) + 56px);
+  color:var(--grey);
+  opacity:calc(1 - var(--fade));
+}
+.ch__dates li{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.ch__dates li:nth-child(1){left:25%}
+.ch__dates li:nth-child(2){left:50%}
+.ch__dates li:nth-child(3){left:75%}
+
+.ch__three{
+  position:absolute;left:0;right:0;top:16.7%;margin:0;
+  font-family:'Pinyon Script',cursive;font-size:var(--fs-three);line-height:1;
+  text-align:center;color:var(--red);
+  z-index:1;
+  opacity:calc(1 - var(--fade));
+}
+.ch__title{
+  position:absolute;left:0;right:0;top:36.7%;margin:0;
+  font-family:'Anton',Impact,sans-serif;font-weight:400;
+  font-size:var(--fs-chap);line-height:.85;text-transform:uppercase;text-align:center;
+  white-space:nowrap;
+  color:color-mix(in srgb,#A3120F calc(var(--ghost) * 100%),#fff);
+  opacity:calc(1 - .5 * var(--ghost));
+}
+.ch__lead{
+  position:absolute;left:50%;top:80%;width:min(520px,80vw);margin:0;transform:translateX(-50%);
+  font-size:15px;line-height:1.45;text-align:center;
+  opacity:calc(1 - var(--fade));
+}
+
+/* letters + script entrance when the section arrives (time-based, once) */
+.ch__l{display:inline-block}
+.js .ch .ch__l{opacity:0;transform:translateY(.35em);filter:blur(10px)}
+.js .ch.is-in .ch__l{
+  opacity:1;transform:none;filter:none;
+  transition:opacity .9s var(--ease-expo),transform 1.2s var(--ease-expo),filter .9s var(--ease-expo);
+  transition-delay:calc(var(--i) * 55ms + 250ms);
+}
+.js .ch .ch__three{clip-path:inset(-20% 100% -20% 0)}
+.js .ch.is-in .ch__three{clip-path:inset(-20% -5% -20% 0);transition:clip-path 1.6s var(--ease-expo) .05s}
+.js .ch .ch__dates li,.js .ch .ch__lead{translate:0 16px;filter:blur(6px)}
+.js .ch:not(.is-in) .ch__dates,.js .ch:not(.is-in) .ch__lead{visibility:hidden}
+.js .ch.is-in .ch__dates li,.js .ch.is-in .ch__lead{translate:0 0;filter:none;transition:translate 1s var(--ease-expo) .7s,filter 1s var(--ease-expo) .7s}
+
+/* ── chapter cards ────────────────────────────────────────────── */
+.ch__cards{list-style:none;margin:0;padding:0;position:absolute;inset:0;z-index:3;pointer-events:none}
+.ch-card{
+  position:absolute;
+  width:var(--cw);
+  container-type:inline-size;
+  transform:
+    translate3d(-50%, calc((1 - var(--in,0)) * 115vh), 0)
+    rotate(calc(var(--in,0) * var(--rot)));
+  opacity:var(--vis,0);
+  pointer-events:auto;
+}
+.ch-card.is-anim{filter:blur(calc((1 - var(--in,0)) * 10px))}
+.ch-card--1{left:19.4444%;top:18.9%;background:var(--paper)}
+.ch-card--2{left:50%;top:12.2%;background:#fff}
+.ch-card--3{left:80.5556%;top:18.9%;background:var(--red)}
+.ch-card__link{
+  display:flex;flex-direction:column;gap:3.8cqw;
+  padding:5.5556cqw 5.5556cqw 6.6cqw;
+  color:var(--ink);
+}
+.ch-card__img{display:block;height:83.3333cqw;overflow:hidden;background:#d9d9d9}
+.ch-card__img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.4s var(--ease-expo)}
+.ch-card__name{font-family:'Anton',Impact,sans-serif;font-size:15.5556cqw;line-height:.95;text-transform:uppercase;margin-top:.4cqw}
+.ch-card__text{font-size:clamp(12px,4.1667cqw,15px);line-height:1.45}
+.ch-card__go{display:inline-flex;gap:6px}
+@media (hover:hover){
+  .ch-card__link:hover .ch-card__img img{transform:scale(1.06)}
+  .ch-card__link:hover .ch-card__go{text-decoration:underline;text-underline-offset:4px}
+}
+
+.ch__strip{
+  position:absolute;left:var(--pad);right:var(--pad);bottom:calc(34px + env(safe-area-inset-bottom));
+  margin:0;display:flex;justify-content:space-between;
+  color:var(--paper);z-index:4;
+}
+
+/* ── phones: cards rise into one stack, each over the last ────── */
+@media (max-width:767px){
+  .ch{--fs-three:15vw;--fs-chap:21vw;--cw:min(68vw,40vh)}
+  .ch__dates li:nth-child(1){left:17%}
+  .ch__dates li:nth-child(3){left:83%}
+  .ch__dates{font-size:10px}
+  .ch__three{top:24%}
+  .ch__title{top:36%}
+  .ch__lead{top:auto;bottom:120px;font-size:14px}
+  .ch-card--1,.ch-card--2,.ch-card--3{left:50%;top:auto;bottom:calc(84px + env(safe-area-inset-bottom))}
+  .ch-card--1{--rot:-5deg!important;margin-bottom:24px}
+  .ch-card--2{--rot:3deg!important;margin-bottom:12px}
+  .ch-card--3{--rot:-1.5deg!important}
+  .ch__strip{bottom:calc(28px + env(safe-area-inset-bottom))}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .js .ch .ch__l,.js .ch .ch__three,.js .ch .ch__dates li,.js .ch .ch__lead{opacity:1;transform:none;filter:none;clip-path:none;translate:none}
+  .ch-card.is-anim{filter:none}
+}

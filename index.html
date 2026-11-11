@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="shop-look.css">
 <link rel="stylesheet" href="her-things.css">
+<link rel="stylesheet" href="chapters.css">
 </head>
 <body>
 
@@ -125,9 +126,62 @@
   </ul>
 </section>
 
+<!-- 05 COLLECTIONS — "Three Chapters". Pinned; the block splits down the middle
+     (after meermohsin.me "Awards") and three chapter cards rise behind it -->
+<section class="ch" id="collections" aria-labelledby="chTitle">
+  <div class="ch__pin">
+    <div class="ch__glow" aria-hidden="true"></div>
+
+    <div class="ch__panel ch__panel--l">
+      <div class="ch__closed" data-ch-closed>
+        <ul class="ch__dates label" role="list">
+          <li>Ch. 01 — 03.2026</li><li>Ch. 02 — 07.2026</li><li>Ch. 03 — 11.2026</li>
+        </ul>
+        <p class="ch__three" aria-hidden="true">Three</p>
+        <h2 class="ch__title" id="chTitle" aria-label="Three chapters"><span class="ch__word" data-ch-letters>Chapters</span></h2>
+        <p class="ch__lead">Every collection starts as a short film. Three chapters so far &mdash; each one shot after dark, each one made in a single small run.</p>
+      </div>
+    </div>
+    <div class="ch__panel ch__panel--r" aria-hidden="true"></div>
+
+    <ul class="ch__cards" role="list">
+      <li class="ch-card ch-card--1" data-ch-card style="--rot:3deg">
+        <a class="ch-card__link" href="#collections">
+          <span class="ch-card__img"><img src="assets/poster.jpg" alt="Blue Hour — the girl on the last train" loading="lazy" decoding="async" style="object-position:50% 30%"></span>
+          <span class="label">Ch. 01 — 03.2026</span>
+          <span class="ch-card__name">Blue Hour</span>
+          <span class="ch-card__text">Washed denim and cold light. Made for the walk home at 5&nbsp;a.m.</span>
+          <span class="label ch-card__go">Enter chapter&nbsp;&nbsp;&rarr;</span>
+        </a>
+      </li>
+      <li class="ch-card ch-card--2" data-ch-card style="--rot:0deg">
+        <a class="ch-card__link" href="#collections">
+          <span class="ch-card__img"><img src="assets/her/tote.jpg" alt="Static — clear tote with chrome handles" loading="lazy" decoding="async"></span>
+          <span class="label">Ch. 02 — 07.2026</span>
+          <span class="ch-card__name">Static</span>
+          <span class="ch-card__text">Sheer layers, chrome hardware and everything that glows under neon.</span>
+          <span class="label ch-card__go">Enter chapter&nbsp;&nbsp;&rarr;</span>
+        </a>
+      </li>
+      <li class="ch-card ch-card--3" data-ch-card style="--rot:-3deg">
+        <a class="ch-card__link" href="#collections">
+          <span class="ch-card__img"><img src="assets/her/jeans.jpg" alt="Soft Riot — pastel washed jeans" loading="lazy" decoding="async"></span>
+          <span class="label">Ch. 03 — 11.2026</span>
+          <span class="ch-card__name">Soft Riot</span>
+          <span class="ch-card__text">Pastel dye and raw edges. Sweet on the outside.</span>
+          <span class="label ch-card__go">Enter chapter&nbsp;&nbsp;&rarr;</span>
+        </a>
+      </li>
+    </ul>
+
+    <p class="ch__strip label" aria-hidden="true"><span>✕</span><span>Cut</span><span>✕</span><span>Dye</span><span>✕</span><span>Wear</span><span>✕</span></p>
+  </div>
+</section>
+
 <script src="https://cdn.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.min.js" defer></script>
 <script src="main.js" defer></script>
 <script src="shop-look.js" defer></script>
 <script src="her-things.js" defer></script>
+<script src="chapters.js" defer></script>
 </body>
 </html>

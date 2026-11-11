@@ -1,6 +1,6 @@
 # AFTR — clothing for the after-hours
 
-Concept site for a unisex clothing brand. Built so far: blocks 01–04 of the home page.
+Concept site for a unisex clothing brand. Built so far: blocks 01–05 of the home page.
 
 - **01 Hero.** A full-screen video plays frame by frame as you scroll. The AFTR® logo exits forward in 3D (it grows, sinks and blurs).
 - **02 Manifesto.** The same video folds into a window in the centre. The heading, the margin notes and the statement *Cut slow / Worn hard / Made to last* appear in sequence. The statement types in word by word.
@@ -33,3 +33,6 @@ The models and product photos are placeholders from the reference. To swap them,
 
 ## Block 04 — Her Things
 `her-things.css` / `her-things.js`. These are the six pieces the girl wears in the film, laid out in the asymmetric Figma grid. Desktop positions are the Figma 1440 px values in `cqw`, so the grid scales as one piece; phones get a two-column flow. Each photo is 20% wider than its frame and drifts sideways as the frame scrolls through the viewport, like the photos on cyphr.studio. Photos in the left half of the screen move right; the right half, including Clear Tote, moves left. The direction is set by `data-drift="right|left"` in the HTML. The photos in `assets/her/` are low-res placeholders cut from the moodboard.
+
+## Block 05 — Collections ("Three Chapters")
+`chapters.css` / `chapters.js`. The block is pinned for two screens of scroll. It reuses the split reveal from meermohsin.me ("Awards & Recognizations"): the closed block is drawn twice, and each copy is clipped to one half of the screen. As you scroll, the halves slide apart, the dark wash clears to a red glow, CHAPTERS fades to half-transparent red, and three chapter cards rise up behind the split. On phones the cards stack on top of one another. The card photos are placeholders: the hero poster and the Her Things photos of the tote and the jeans.
