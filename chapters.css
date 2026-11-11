@@ -136,9 +136,18 @@
 }
 
 .ch__strip{
-  position:absolute;left:var(--pad);right:var(--pad);bottom:calc(34px + env(safe-area-inset-bottom));
-  margin:0;display:flex;justify-content:space-between;
+  position:absolute;left:var(--pad);right:var(--pad);bottom:calc(30px + env(safe-area-inset-bottom));
+  margin:0;display:flex;justify-content:space-between;align-items:center;
+  font-size:clamp(14px,1.25vw,20px);       /* 18px @1440 (was 12) */
+  letter-spacing:.06em;
   color:var(--paper);z-index:4;
+}
+/* the ✕ marks spin around their own centre as you scroll (chapters.js writes --spin) */
+.ch__strip span:nth-child(odd){
+  display:inline-block;
+  font-size:1.15em;line-height:1;
+  transform:rotate(var(--spin,0deg));
+  will-change:transform;
 }
 
 /* ── phones: cards rise into one stack, each over the last ────── */
@@ -154,7 +163,7 @@
   .ch-card--1{--rot:-5deg!important;margin-bottom:24px}
   .ch-card--2{--rot:3deg!important;margin-bottom:12px}
   .ch-card--3{--rot:-1.5deg!important}
-  .ch__strip{bottom:calc(28px + env(safe-area-inset-bottom))}
+  .ch__strip{bottom:calc(26px + env(safe-area-inset-bottom));font-size:13px}
 }
 
 @media (prefers-reduced-motion:reduce){

@@ -52,6 +52,7 @@ function update(){
   var p = span > 0 ? clamp01(-r.top / span) : 0;
   if (reduced) p = p > 0.3 ? 1 : 0;
   sec.__p = p;                       // read by the desktop 3D scene (chapters-3d.js)
+  set(sec, '--spin', (p * (sec.classList.contains('has-3d') ? 1440 : 720)).toFixed(1) + 'deg', 'spin');   // ✕ marks: 4 turns (desktop) / 2 turns (phone)
   // 3D timeline only when the cards really live in the 3D layer; otherwise
   // (old cached 3D script, failed import…) fall back to the flat version
   if (sec.classList.contains('has-3d') && sec.querySelector('.ch__css3d [data-ch-card]')){
