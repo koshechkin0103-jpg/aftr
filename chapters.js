@@ -51,6 +51,7 @@ function update(){
   var r = sec.getBoundingClientRect(), span = sec.offsetHeight - innerHeight;
   var p = span > 0 ? clamp01(-r.top / span) : 0;
   if (reduced) p = p > 0.3 ? 1 : 0;
+  sec.__p = p;                       // read by the desktop 3D scene (chapters-3d.js)
   set(sec, '--fade',  r3(ease(seg(p, .12, .34))), 'f');
   set(sec, '--split', r3(ease(seg(p, .14, .55))), 's');
   set(sec, '--glow',  r3(ease(seg(p, .18, .58))), 'g');

@@ -28,6 +28,11 @@
   transform:scale(calc(.75 + .25 * var(--glow)));
 }
 
+/* desktop 3D scene (chapters-3d.js) replaces the flat glow when it runs */
+.ch__scene{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:var(--glow);pointer-events:none}
+.ch.has-3d .ch__glow{display:none}
+@media (max-width:767px){.ch__scene{display:none}}
+
 /* ── the two halves ───────────────────────────────────────────── */
 .ch__panel{position:absolute;top:0;bottom:0;width:50%;overflow:hidden;z-index:2}
 .ch__panel--l{left:0;transform:translate3d(calc(var(--split) * -50%),0,0)}
