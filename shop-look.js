@@ -135,8 +135,10 @@ function build(){
   h += '<button class="rw__icon" type="button" data-rw-prev aria-label="Previous look">' + SVG.prev + '</button>';
   h += '<div class="rw__ticks">';
   LOOKS.forEach(function(look, i){
+    /* casting strip: a head-and-shoulders crop of each look, number under it, progress bar under that */
     h += '<button class="rw__tick" type="button" data-rw-tick="' + i + '" aria-current="' + (i === 0) + '" aria-label="Look ' + (i + 1) + ': ' + esc(look.name) + '">' +
-         '<span class="rw__tick-bar"></span><span class="rw__tick-label">' + pad2(i + 1) + '<span class="rw__tick-name">&nbsp;&nbsp;' + esc(look.name) + '</span></span></button>';
+         '<span class="rw__tick-face" style="background-image:url(' + m640(look.model) + ')"></span>' +
+         '<span class="rw__tick-num">' + pad2(i + 1) + '</span><span class="rw__tick-bar"></span></button>';
   });
   h += '</div>';
   h += '<button class="rw__icon rw__auto" type="button" data-rw-auto aria-pressed="false" aria-label="Autoplay">' + SVG.play + SVG.pause + '</button>';
@@ -398,9 +400,9 @@ class LookRunway extends HTMLElement {
     var r = this.stage.getBoundingClientRect();
     this.W = r.width; this.H = r.height;
     var ring = this.mode === 'ring';
-    this.fs = ring ? 1.08 : 1;
+    this.fs = ring ? 1.24 : 1;          // the look in front stands 24% taller than the ring
     this.style.setProperty('--rw-fs', this.fs);
-    var modelH = ring ? Math.max(200, Math.round((this.H - 34 - 18) / 1.08)) : Math.max(200, Math.round(this.H - 22 - 18));
+    var modelH = ring ? Math.max(200, Math.round((this.H - 34 - 18) / this.fs)) : Math.max(200, Math.round(this.H - 22 - 18));
     this.modelH = modelH;
     this.stage.style.setProperty('--rw-model-h', modelH + 'px');
     this.hx = ring ? 0.5 * this.W : 0.3 * this.W;
@@ -487,7 +489,7 @@ class LookRunway extends HTMLElement {
   }
   renderAll(){ if (this.mode === 'ring') this.renderRing(); else this.renderClassic(); }
   renderRing(){
-    var W = this.W, H = this.H, cx = 0.5 * W, R = 0.62 * W, P = 1.65 * W, floor = H - 34, hor = 0.36 * H, step = TAU / this.N, fs = this.fs, self = this;
+    var W = this.W, H = this.H, cx = 0.5 * W, R = 0.84 * W, P = 1.65 * W, floor = H - 34, hor = 0.36 * H, step = TAU / this.N, fs = this.fs, self = this;
     this.bodies.forEach(function(b){
       var phi = ((b.a - self.cur) * step) % TAU;
       if (phi > Math.PI) phi -= TAU; else if (phi <= -Math.PI) phi += TAU;

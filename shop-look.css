@@ -781,3 +781,27 @@ look-runway button:focus-visible,look-runway a:focus-visible{outline:2px solid v
 .rw--js .rw__count{opacity:0;transform:translateY(22px);filter:blur(8px)}
 .rw--js.is-revealed .rw__count{opacity:1;transform:none;filter:none;transition:opacity 1.1s var(--rw-ease) .2s,transform 1.4s var(--rw-ease) .2s,filter 1.1s var(--rw-ease) .2s}
 @media (prefers-reduced-motion:reduce){.rw--js .rw__count{opacity:1;transform:none;filter:none}}
+
+/* ── casting strip (replaces the 01–06 bars): a portrait of each look ── */
+.rw__ticks{gap:12px;align-items:flex-end}
+.rw__tick,
+.rw__tick[aria-current="true"]{
+  flex:0 0 auto;width:54px;height:auto;min-width:0;
+  display:flex;flex-direction:column;align-items:stretch;gap:7px;
+  color:var(--rw-muted);
+}
+.rw__tick-face{
+  display:block;width:54px;height:66px;
+  background:#EEECE8 no-repeat 50% 5%/290% auto;
+  filter:grayscale(1) contrast(.95);opacity:.55;
+  transition:filter .5s var(--rw-ease),opacity .5s,transform .6s var(--rw-ease),box-shadow .4s;
+}
+.rw__tick:hover .rw__tick-face{opacity:.9}
+.rw__tick[aria-current="true"] .rw__tick-face{
+  filter:none;opacity:1;transform:translateY(-6px) scale(1.08);
+  box-shadow:0 0 0 1px var(--rw-text),0 14px 24px -14px rgb(0 0 0/.5);
+}
+.rw__tick-num{font-family:'Geist Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.06em;text-align:left;font-variant-numeric:tabular-nums}
+.rw__tick[aria-current="true"] .rw__tick-num{font-family:'Anton',Impact,sans-serif;font-size:14px;letter-spacing:.02em;color:var(--rw-text)}
+.rw__tick .rw__tick-bar,.rw__tick:hover .rw__tick-bar{transform:none}
+.rw__tick-label{display:none}
