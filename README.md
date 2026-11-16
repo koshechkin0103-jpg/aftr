@@ -26,10 +26,10 @@ ffmpeg -i source.mp4 -an -vf scale=1280:-2 -c:v libx264 -crf 24 -g 4 -keyint_min
 ```
 To replace the video, re-encode the new clip with the same commands and swap the files.
 
-## Block 03 — Shop the Look
-`shop-look.js` / `shop-look.css` define the `<look-runway>` element. On desktop the looks stand on a 3D ring; on phones they walk along a diagonal line. Looks change every 5 s, by dragging, with the arrows or with the keys. The front model opens a "View look" popup with numbered pins. The "In this look" panel has size pickers (a bottom sheet on phones), "Add full look to bag" and a local styling bag (localStorage).
+## Block 03 — Shop the Look ("the reel")
+`reel.js` / `reel.css`. AFTR's own interface: the six looks are frames on a strip of film laid on a light table, with sprocket holes, edge print, a countdown leader and "The end". The frame in the gate is in colour, with red crop marks, "● Now showing" and crosshairs on each piece; the other frames are dimmed like film held to the light. Drag the film, scroll it sideways, use the arrow keys, or click a frame to pull a look into the gate. A cutting-room ruler with a red playhead and a running 24 fps timecode replaces the usual dots; "Play reel" advances a scene every 5 s. The pieces are listed as end credits on a black screen: click a credit to pick a size and add it, or add the whole scene for 10% off. The bag is a local shortlist behind "Bag (0)" in the nav.
 
-The models and product photos are placeholders from the reference. To swap them, edit `LOOKS` and `PRODUCTS` at the top of `shop-look.js`. Bottoms have no product photo yet, so their thumbnails are a crop of the model's legs.
+The models and product data are placeholders: edit `LOOKS` / `PRODUCTS` at the top of `reel.js`.
 
 ## Block 04 — Her Things
 `her-things.css` / `her-things.js`. These are the six pieces the girl wears in the film, laid out in the asymmetric Figma grid. Desktop positions are the Figma 1440 px values in `cqw`, so the grid scales as one piece; phones get a two-column flow. Each photo is 20% wider than its frame and drifts sideways as the frame scrolls through the viewport, like the photos on cyphr.studio. Photos in the left half of the screen move right; the right half, including Clear Tote, moves left. The direction is set by `data-drift="right|left"` in the HTML. The photos in `assets/her/` are low-res placeholders cut from the moodboard.
