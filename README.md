@@ -31,6 +31,8 @@ To replace the video, re-encode the new clip with the same commands and swap the
 
 The models and product photos are placeholders from the reference. To swap them, edit `LOOKS` and `PRODUCTS` at the top of `shop-look.js`. Bottoms have no product photo yet, so their thumbnails are a crop of the model's legs.
 
+**AFTR type layer** (at the end of `shop-look.css`). The runway mechanics are the reference's, but the type is AFTR's own: a large Anton counter "01 / 06" with the look's name in Pinyon Script, the panel heading and piece names in Anton, prices and labels in Geist Mono, a handwritten "drag / view" cursor, and Anton numerals on the pins and the current tick.
+
 ## Block 04 — Her Things
 `her-things.css` / `her-things.js`. These are the six pieces the girl wears in the film, laid out in the asymmetric Figma grid. Desktop positions are the Figma 1440 px values in `cqw`, so the grid scales as one piece; phones get a two-column flow. Each photo is 20% wider than its frame and drifts sideways as the frame scrolls through the viewport, like the photos on cyphr.studio. Photos in the left half of the screen move right; the right half, including Clear Tote, moves left. The direction is set by `data-drift="right|left"` in the HTML. The photos in `assets/her/` are low-res placeholders cut from the moodboard.
 

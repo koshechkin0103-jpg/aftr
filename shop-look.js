@@ -58,6 +58,10 @@ function bundle(look){
   var full = 0; for (var j = 0; j < look.pieces.length; j++) full += piece(look, j).price;
   return { full:full, deal:Math.round(full * (1 - SAVE) * 100) / 100 };
 }
+/* panel heading: small mono kicker + the look's name in Anton */
+function ptitleHTML(i){
+  return '<span class="rw__mono rw__ptitle-k">In this look&nbsp;&nbsp;—&nbsp;&nbsp;' + pad2(i + 1) + '</span><span class="rw__ptitle-name">' + esc(LOOKS[i].name) + '</span>';
+}
 function thumbHTML(p, cls){
   if (p.crop) return '<span class="rw__crop ' + (cls || '') + '" style="background-image:url(' + p.crop + ');background-size:' + CROP.size + ';background-position:' + CROP.pos + '"></span>';
   return '<img class="' + (cls || '') + '" src="' + p.img + '" width="400" height="' + p.h + '" alt="" loading="lazy" decoding="async">';
@@ -95,7 +99,11 @@ function build(){
   h += '<div class="rw__head"><div class="rw__intro">' +
          '<h2 class="rw__title">Shop the look</h2>' +
          '<p class="rw__sub">Six looks, styled head to toe by our designers. Tap a pin to see every piece.</p>' +
-       '</div><span class="rw__sr" aria-live="polite" aria-atomic="true" data-rw-live></span></div>';
+       '</div>' +
+       /* big look counter: Anton number, mono "/ 06", the look's name in script */
+       '<div class="rw__count" aria-hidden="true"><span class="rw__count-n"><span data-rw-count>01</span></span><span class="rw__count-of">/ ' + pad2(LOOKS.length) + '</span>' +
+       '<span class="rw__count-name" data-rw-count-name>' + esc(LOOKS[0].name) + '</span></div>' +
+       '<span class="rw__sr" aria-live="polite" aria-atomic="true" data-rw-live></span></div>';
 
   h += '<div class="rw__stage" data-rw-stage tabindex="0" role="region" aria-roledescription="carousel" aria-label="Shop the look — use arrow keys or swipe to change look">';
   h += '<div class="rw__actors" data-rw-actors>';
@@ -119,7 +127,7 @@ function build(){
   });
   h += '</div>';
   h += '<span class="rw__sweep" aria-hidden="true"></span>';
-  h += '<span class="rw__cursor" data-rw-cursor aria-hidden="true"><span class="rw__cursor-in"><span class="rw__cursor-label rw__cursor-drag">Drag</span><span class="rw__cursor-label rw__cursor-view">View</span></span></span>';
+  h += '<span class="rw__cursor" data-rw-cursor aria-hidden="true"><span class="rw__cursor-in"><span class="rw__cursor-label rw__cursor-drag">drag</span><span class="rw__cursor-label rw__cursor-view">view</span></span></span>';
   h += '<span class="rw__walk" aria-hidden="true"><span class="rw__walk-line"></span></span>';
   h += '</div>';
 
@@ -145,7 +153,7 @@ function build(){
 
   /* panel */
   h += '<div class="rw__panel"><div class="rw__panel-inner">';
-  h += '<div class="rw__panel-head"><p class="rw__panel-title rw__mono" data-rw-ptitle>In this look&nbsp;&nbsp;—&nbsp;&nbsp;01 ' + esc(LOOKS[0].name) + '</p><span class="rw__label rw__mono" data-rw-pieces>' + LOOKS[0].pieces.length + ' pieces</span></div>';
+  h += '<div class="rw__panel-head"><p class="rw__panel-title" data-rw-ptitle>' + ptitleHTML(0) + '</p><span class="rw__label rw__mono" data-rw-pieces>' + LOOKS[0].pieces.length + ' pieces</span></div>';
   LOOKS.forEach(function(look, i){
     var b = bundle(look);
     h += '<div class="rw__look-panel' + (i === 0 ? ' is-in' : '') + '" data-rw-panel="' + i + '"' + (i ? ' hidden' : '') + '>';
@@ -156,7 +164,7 @@ function build(){
       h += '<li class="rw__item" data-rw-card="' + n + '" style="--i:' + n + '" data-title="' + esc(p.name) + '" data-key="' + p.key + '" data-price="' + p.price + '">';
       if (p.tag) h += '<span class="rw__tag"><span class="rw__tag-text">' + p.tag + '</span></span>';
       h += '<span class="rw__media" aria-hidden="true">' + thumbHTML(p) + '<span class="rw__num">' + n + '</span></span>';
-      h += '<div class="rw__info"><span class="rw__type rw__mono">AFTR&nbsp;&nbsp;·&nbsp;&nbsp;' + pad2(n) + '</span><span class="rw__name">' + esc(p.name) + '</span><span class="rw__price">' + money(p.price) + '</span></div>';
+      h += '<div class="rw__info"><span class="rw__type rw__mono">' + pad2(n) + '&nbsp;&nbsp;—&nbsp;&nbsp;' + (['Top', 'Bottoms', 'Shoes'][j] || 'Piece') + '</span><span class="rw__name">' + esc(p.name) + '</span><span class="rw__price rw__mono">' + money(p.price) + '</span></div>';
       h += '<button class="rw__add" type="button" data-rw-add aria-expanded="false" aria-controls="' + pid + '" aria-label="Add to bag: ' + esc(p.name) + '">' + SVG.plus + SVG.check + SVG.spin + '</button>';
       h += '<div class="rw__picker" id="' + pid + '" data-rw-picker hidden>' +
              '<div class="rw__picker-head">' + thumbHTML(p, 'rw__picker-thumb') + '<div><div class="rw__picker-title">' + esc(p.name) + '</div><div class="rw__picker-price">' + money(p.price) + '</div></div>' +
@@ -294,6 +302,8 @@ class LookRunway extends HTMLElement {
     this.live    = q('[data-rw-live]');
     this.piecesL = q('[data-rw-pieces]');
     this.ptitle  = q('[data-rw-ptitle]');
+    this.countN  = q('[data-rw-count]');
+    this.countName = q('[data-rw-count-name]');
     this.lb      = q('[data-rw-lb]');
     this.lbStage = q('[data-rw-lb-stage]');
     this.cursor  = q('[data-rw-cursor]');
@@ -554,11 +564,13 @@ class LookRunway extends HTMLElement {
     this.panels.forEach(function(p, j){ p.hidden = j !== i; p.classList.remove('is-in'); });
     var look = LOOKS[i];
     this.piecesL.textContent = look.pieces.length + ' pieces';
-    this.ptitle.innerHTML = 'In this look&nbsp;&nbsp;—&nbsp;&nbsp;' + pad2(i + 1) + ' ' + esc(look.name);
+    this.ptitle.innerHTML = ptitleHTML(i);
+    this.countN.textContent = pad2(i + 1);
+    this.countName.textContent = look.name;
     if (!silent){
       void this.offsetWidth;
       this.panels[i].classList.add('is-in');
-      [this.piecesL, this.ptitle].forEach(function(el){ el.classList.remove('is-swap'); void el.offsetWidth; el.classList.add('is-swap'); });
+      [this.piecesL, this.ptitle, this.countN, this.countName].forEach(function(el){ el.classList.remove('is-swap'); void el.offsetWidth; el.classList.add('is-swap'); });
       if (!this.reduced){ this.stage.classList.remove('is-sweep'); void this.stage.offsetWidth; this.stage.classList.add('is-sweep'); }
       this.live.textContent = 'Look ' + (i + 1) + ': ' + look.name;
     } else this.panels[i].classList.add('is-in');

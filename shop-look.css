@@ -727,3 +727,57 @@ look-runway button:focus-visible,look-runway a:focus-visible{outline:2px solid v
   .rw--js .rw__title,.rw--js .rw__sub,.rw--js .rw__panel-head{filter:none;transform:none}
   .bag-toast{transition:none}
 }
+
+/* ─────────────────────────────────────────────────────────────
+   AFTR TYPE LAYER — keeps the runway mechanics, swaps the generic
+   template type for the site's own voice: Anton for names and numbers,
+   Pinyon Script for the script accents, Geist Mono for labels.
+   ───────────────────────────────────────────────────────────── */
+/* big look counter in the head: 01 / 06 + the look's name in script */
+.rw__count{
+  flex:0 0 auto;max-width:45%;
+  display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:flex-end;column-gap:12px;
+  text-align:right;color:var(--rw-text);
+}
+.rw__count-n{font-family:'Anton',Impact,sans-serif;font-size:min(9vw,14vh);line-height:.78;font-variant-numeric:tabular-nums}
+.rw__count-n > span{display:inline-block}
+.rw__count-of{font-family:'Geist Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.04em;color:var(--rw-muted);padding-bottom:.3em}
+.rw__count-name{flex-basis:100%;margin-top:8px;font-family:'Pinyon Script',cursive;font-size:clamp(26px,2.6vw,40px);line-height:1;white-space:nowrap}
+[data-rw-count].is-swap{animation:rw-count-in .9s var(--rw-ease)}
+.rw__count-name.is-swap{animation:rw-fade 1s var(--rw-ease)}
+@keyframes rw-count-in{from{opacity:0;transform:translateY(40%)}}
+
+/* current look on the progress bar reads in Anton */
+.rw__tick[aria-current="true"] .rw__tick-label{font-family:'Anton',Impact,sans-serif;font-size:16px;letter-spacing:.02em}
+
+/* cursor: handwritten instead of spaced caps */
+.rw__cursor-label{font-family:'Pinyon Script',cursive;font-size:26px;letter-spacing:0;padding-left:0;text-transform:none}
+.rw.is-dragging .rw__cursor-drag{letter-spacing:.06em}
+
+/* pins: Anton numerals */
+.rw__pin-dot{font-family:'Anton',Impact,sans-serif;font-size:13px}
+
+/* panel: look name as a headline, pieces as Anton names + mono prices */
+.rw__panel-head{align-items:flex-end}
+.rw__panel-title{display:flex;flex-direction:column;gap:12px;min-width:0}
+.rw__ptitle-k{color:var(--rw-muted)}
+.rw__ptitle-name{font-family:'Anton',Impact,sans-serif;font-size:40px;line-height:.95;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rw__name{font-family:'Anton',Impact,sans-serif;font-size:22px;line-height:1;text-transform:uppercase;letter-spacing:.01em}
+.rw__price{font-size:13px}
+.rw__bundle-title{font-family:'Anton',Impact,sans-serif;font-size:24px;line-height:1;text-transform:uppercase}
+.rw__bundle-price strong{font-family:'Anton',Impact,sans-serif;font-weight:400;font-size:34px}
+.rw__mhead-title{font-family:'Anton',Impact,sans-serif;font-size:22px;text-transform:uppercase}
+
+@media (max-width:1099px) and (min-width:750px){
+  .rw__count{max-width:none;justify-content:flex-start;text-align:left}
+}
+@media (max-width:749px){
+  .rw__count{max-width:none;justify-content:flex-start;text-align:left}
+  .rw__count-n{font-size:56px}
+  .rw__count-name{font-size:26px;margin-top:4px}
+  .rw__name{font-size:18px}
+}
+/* the counter enters with the title */
+.rw--js .rw__count{opacity:0;transform:translateY(22px);filter:blur(8px)}
+.rw--js.is-revealed .rw__count{opacity:1;transform:none;filter:none;transition:opacity 1.1s var(--rw-ease) .2s,transform 1.4s var(--rw-ease) .2s,filter 1.1s var(--rw-ease) .2s}
+@media (prefers-reduced-motion:reduce){.rw--js .rw__count{opacity:1;transform:none;filter:none}}
